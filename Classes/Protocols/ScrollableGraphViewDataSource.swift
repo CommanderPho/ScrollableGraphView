@@ -7,3 +7,10 @@ public protocol ScrollableGraphViewDataSource {
     func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool
     func numberOfPoints() -> Int // This now forces the same number of points in each plot.
 }
+
+
+extension ScrollableGraphViewDataSource {
+    func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool {
+        return true
+    }
+}

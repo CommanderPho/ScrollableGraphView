@@ -26,6 +26,7 @@
 		298BFD581F121BB00062F5C8 /* LabelPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD461F121BB00062F5C8 /* LabelPool.swift */; };
 		298BFD591F121BB00062F5C8 /* ReferenceLines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD471F121BB00062F5C8 /* ReferenceLines.swift */; };
 		298BFD5A1F121BB00062F5C8 /* ScrollableGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */; };
+		D74709182013EA1900CBA121 /* PlotPointData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74709172013EA1900CBA121 /* PlotPointData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		298BFD461F121BB00062F5C8 /* LabelPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelPool.swift; sourceTree = "<group>"; };
 		298BFD471F121BB00062F5C8 /* ReferenceLines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceLines.swift; sourceTree = "<group>"; };
 		298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableGraphView.swift; sourceTree = "<group>"; };
+		D74709172013EA1900CBA121 /* PlotPointData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotPointData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +133,7 @@
 		298BFD3B1F121BB00062F5C8 /* Animation */ = {
 			isa = PBXGroup;
 			children = (
+				D74709172013EA1900CBA121 /* PlotPointData.swift */,
 				298BFD3C1F121BB00062F5C8 /* GraphPoint.swift */,
 				298BFD3D1F121BB00062F5C8 /* GraphPointAnimation.swift */,
 			);
@@ -242,6 +245,7 @@
 				298BFD4C1F121BB00062F5C8 /* GradientDrawingLayer.swift in Sources */,
 				298BFD4A1F121BB00062F5C8 /* DotDrawingLayer.swift in Sources */,
 				298BFD521F121BB00062F5C8 /* BarPlot.swift in Sources */,
+				D74709182013EA1900CBA121 /* PlotPointData.swift in Sources */,
 				298BFD4B1F121BB00062F5C8 /* FillDrawingLayer.swift in Sources */,
 				298BFD4D1F121BB00062F5C8 /* LineDrawingLayer.swift in Sources */,
 				298BFD491F121BB00062F5C8 /* BarDrawingLayer.swift in Sources */,
@@ -414,6 +418,7 @@
 				298BFD301F121BA10062F5C8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

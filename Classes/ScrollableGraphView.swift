@@ -494,7 +494,7 @@ import UIKit
         // If we are not animating on startup then just set all the plot positions to their respective values
         if(!shouldAnimateOnStartup) {
             let dataForInitialPoints = getData(forPlot: plot, andActiveInterval: activePointsInterval)
-            plot.setPlotPointPositions(forNewlyActivatedPoints: activePointsInterval, withData: dataForInitialPoints.map({$0.value}))
+            plot.setPlotPointDataValues(forNewlyActivatedPoints: activePointsInterval, withData: dataForInitialPoints)
         }
         
         addSubLayers(layers: plot.layers(forViewport: currentViewport()))
@@ -590,7 +590,7 @@ import UIKit
         else {
             
             let range = calculateRange(for: dataForActivePoints.map({$0.value}))
-            // TODO: visibility
+            //TODO: perhaps use isVisible to modify the range (like cutting out invisible values)
             return clean(range: range)
         }
     }
@@ -654,12 +654,6 @@ import UIKit
         }
     }
 
-    struct PlotPointData {
-        var value: Double = 0.0
-        var isVisible: Bool = false
-    }
-
-
 
     private func getData(forPlot plot: Plot, andActiveInterval activeInterval: CountableRange<Int>) -> [PlotPointData] {
         var dataForInterval = [PlotPointData]()
@@ -697,8 +691,7 @@ import UIKit
         if(!isInitialSetup) {
             for plot in plots {
                 let newData = getData(forPlot: plot, andNewlyActivatedPoints: activatedPoints)
-                plot.setPlotPointPositions(forNewlyActivatedPoints: activatedPoints, withData: newData.map({$0.value}))
-                //TODO: set visibility here
+                plot.setPlotPointDataValues(forNewlyActivatedPoints: activatedPoints, withData: newData)
             }
         }
         
@@ -723,8 +716,7 @@ import UIKit
             // Otherwise we should simple just move the data to their positions.
             for plot in plots {
                 let newData = getData(forPlot: plot, andActiveInterval: activePointsInterval)
-                plot.setPlotPointPositions(forNewlyActivatedPoints: intervalForActivePoints(), withData: newData.map({$0.value}))
-                //TODO: set visibility here
+                plot.setPlotPointDataValues(forNewlyActivatedPoints: intervalForActivePoints(), withData: newData)
             }
         }
         
@@ -787,7 +779,7 @@ import UIKit
         
         for plot in plots {
             let dataForPointsToAnimate = getData(forPlot: plot, andActiveInterval: pointsToAnimate)
-            plot.startAnimations(forPoints: pointsToAnimate, withData: dataForPointsToAnimate.map({$0.value}), withStaggerValue: stagger)
+            plot.startAnimations(forPoints: pointsToAnimate, withData: dataForPointsToAnimate, withStaggerValue: stagger)
 
             //TODO: Visibility
         }
