@@ -13,13 +13,23 @@ internal class ReferenceLineDrawingView : UIView {
     private var rightLabelInset: CGFloat = 10
     
     // Store information about the ScrollableGraphView
-    private var currentRange: (min: Double, max: Double) = (0,100)
+    private var currentYAxisRange: (min: Double, max: Double) = (0,100)
     private var topMargin: CGFloat = 10
     private var bottomMargin: CGFloat = 10
+
+    private var currentXAxisRange: (min: Int, max: Int) = (0,100)
+    private var leftMargin: CGFloat = 0
+    private var rightMargin: CGFloat = 0
     
     private var lineWidth: CGFloat {
         get {
             return self.bounds.width
+        }
+    }
+
+    private var lineHeight: CGFloat {
+        get {
+            return self.bounds.height
         }
     }
     
@@ -74,21 +84,44 @@ internal class ReferenceLineDrawingView : UIView {
         labels.removeAll()
         
         if(self.settings.includeMinMax) {
-            let maxLineStart = CGPoint(x: 0, y: topMargin)
-            let maxLineEnd = CGPoint(x: lineWidth, y: topMargin)
-            
-            let minLineStart = CGPoint(x: 0, y: self.bounds.height - bottomMargin)
-            let minLineEnd = CGPoint(x: lineWidth, y: self.bounds.height - bottomMargin)
-            
+            //Min
+            let minLineStart: CGPoint!
+            let minLineEnd: CGPoint!
+
+            let maxLineStart: CGPoint!
+            let maxLineEnd: CGPoint!
+
+            let maxString: String!
+            let minString: String!
+
             let numberFormatter = referenceNumberFormatter()
-            
-            let maxString = numberFormatter.string(from: self.currentRange.max as NSNumber)! + units
-            let minString = numberFormatter.string(from: self.currentRange.min as NSNumber)! + units
-            
+
+            switch self.settings.referenceLineOrientation {
+            case .Horizontal:
+                maxLineStart = CGPoint(x: 0, y: topMargin)
+                maxLineEnd = CGPoint(x: lineWidth, y: topMargin)
+
+                minLineStart = CGPoint(x: 0, y: self.bounds.height - bottomMargin)
+                minLineEnd = CGPoint(x: lineWidth, y: self.bounds.height - bottomMargin)
+
+                maxString = numberFormatter.string(from: self.currentYAxisRange.max as NSNumber)! + units
+                minString = numberFormatter.string(from: self.currentYAxisRange.min as NSNumber)! + units
+            case .Vertical:
+                maxLineStart = CGPoint(x: self.bounds.width - rightMargin, y: 0)
+                maxLineEnd = CGPoint(x: self.bounds.width - rightMargin, y: lineHeight)
+
+                minLineStart = CGPoint(x: leftMargin, y: 0)
+                minLineEnd = CGPoint(x: leftMargin, y: lineHeight)
+
+                maxString = numberFormatter.string(from: self.currentXAxisRange.max as NSNumber)! + units
+                minString = numberFormatter.string(from: self.currentXAxisRange.min as NSNumber)! + units
+            }
+
             addLine(withTag: maxString, from: maxLineStart, to: maxLineEnd, in: referenceLinePath)
             addLine(withTag: minString, from: minLineStart, to: minLineEnd, in: referenceLinePath)
         }
-        
+
+        // The rect we are able to draw in
         let initialRect = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y + topMargin, width: self.bounds.size.width, height: self.bounds.size.height - (topMargin + bottomMargin))
         
         switch(settings.positionType) {
@@ -100,6 +133,9 @@ internal class ReferenceLineDrawingView : UIView {
         
         return referenceLinePath
     }
+
+
+
     
     private func referenceNumberFormatter() -> NumberFormatter {
         let numberFormatter = NumberFormatter()
@@ -113,6 +149,7 @@ internal class ReferenceLineDrawingView : UIView {
     private func createReferenceLines(in rect: CGRect, atRelativePositions relativePositions: [Double], forPath path: UIBezierPath) {
         
         let height = rect.size.height
+        let width = rect.size.width
         var relativePositions = relativePositions
         
         // If we are including the min and max already need to make sure we don't redraw them.
@@ -123,12 +160,20 @@ internal class ReferenceLineDrawingView : UIView {
         }
         
         for relativePosition in relativePositions {
-            
-            let yPosition = height * CGFloat(1 - relativePosition)
-            
-            let lineStart = CGPoint(x: 0, y: rect.origin.y + yPosition)
-            let lineEnd = CGPoint(x: lineStart.x + lineWidth, y: lineStart.y)
-            
+            let lineStart: CGPoint!
+            let lineEnd: CGPoint!
+
+            switch self.settings.referenceLineOrientation {
+            case .Horizontal:
+                let yPosition = height * CGFloat(1 - relativePosition)
+                lineStart = CGPoint(x: 0, y: rect.origin.y + yPosition)
+                lineEnd = CGPoint(x: lineStart.x + lineWidth, y: lineStart.y)
+
+            case .Vertical:
+                let xPosition = width * CGFloat(1 - relativePosition)
+                lineStart = CGPoint(x: rect.origin.x + xPosition, y: rect.origin.y)
+                lineEnd = CGPoint(x: lineStart.x, y: lineStart.y + lineHeight)
+            }
             createReferenceLineFrom(from: lineStart, to: lineEnd, in: path)
         }
     }
@@ -136,25 +181,42 @@ internal class ReferenceLineDrawingView : UIView {
     private func createReferenceLines(in rect: CGRect, atAbsolutePositions absolutePositions: [Double], forPath path: UIBezierPath) {
         
         for absolutePosition in absolutePositions {
-            
-            let yPosition = calculateYPositionForYAxisValue(value: absolutePosition)
-            
-            // don't need to add rect.origin.y to yPosition like we do for relativePositions,
-            // as we calculate the position for the y axis value in the previous line,
-            // this already takes into account margins, etc.
-            let lineStart = CGPoint(x: 0, y: yPosition)
-            let lineEnd = CGPoint(x: lineStart.x + lineWidth, y: lineStart.y)
-            
+            let lineStart: CGPoint!
+            let lineEnd: CGPoint!
+
+            switch self.settings.referenceLineOrientation {
+            case .Horizontal:
+                let yPosition = calculateYPositionForYAxisValue(value: absolutePosition)
+                // don't need to add rect.origin.y to yPosition like we do for relativePositions,
+                // as we calculate the position for the y axis value in the previous line,
+                // this already takes into account margins, etc.
+                lineStart = CGPoint(x: 0, y: yPosition)
+                lineEnd = CGPoint(x: lineStart.x + lineWidth, y: lineStart.y)
+
+            case .Vertical:
+                let xPosition = calculateXPositionForXAxisValue(value: Int(absolutePosition.rounded()))
+                lineStart = CGPoint(x: xPosition, y: 0)
+                lineEnd = CGPoint(x: lineStart.x, y: lineStart.y + lineHeight)
+            }
+
             createReferenceLineFrom(from: lineStart, to: lineEnd, in: path)
         }
     }
     
     private func createReferenceLineFrom(from lineStart: CGPoint, to lineEnd: CGPoint, in path: UIBezierPath) {
         if(self.settings.shouldAddLabelsToIntermediateReferenceLines) {
-            
-            let value = calculateYAxisValue(for: lineStart)
+
             let numberFormatter = referenceNumberFormatter()
-            var valueString = numberFormatter.string(from: value as NSNumber)!
+            var valueString: String = ""
+
+            switch self.settings.referenceLineOrientation {
+            case .Horizontal:
+                let value = calculateYAxisValue(for: lineStart)
+                valueString = numberFormatter.string(from: value as NSNumber)!
+            case .Vertical:
+                let value = calculateYAxisValue(for: lineStart)
+                valueString = numberFormatter.string(from: value as NSNumber)!
+            }
             
             if(self.settings.shouldAddUnitsToIntermediateReferenceLineLabels) {
                 valueString += " \(units)"
@@ -248,9 +310,12 @@ internal class ReferenceLineDrawingView : UIView {
                 
                 let startGapEnd = gaps[i].end
                 let endGapStart = gaps[i + 1].start
-                
-                let lineStart = CGPoint(x: startGapEnd, y: from.y)
-                let lineEnd = CGPoint(x: endGapStart, y: from.y)
+
+                let lineStart: CGPoint!
+                let lineEnd: CGPoint!
+
+                lineStart = CGPoint(x: startGapEnd, y: from.y)
+                lineEnd = CGPoint(x: endGapStart, y: from.y)
                 
                 addLine(from: lineStart, to: lineEnd, in: path)
             }
@@ -280,7 +345,7 @@ internal class ReferenceLineDrawingView : UIView {
         //                                          min = the range's current mininum
         //                                          max = the range's current maximum
         
-        var value = (((point.y - topMargin) / (graphHeight)) * CGFloat((self.currentRange.min - self.currentRange.max))) + CGFloat(self.currentRange.max)
+        var value = (((point.y - topMargin) / (graphHeight)) * CGFloat((self.currentYAxisRange.min - self.currentYAxisRange.max))) + CGFloat(self.currentYAxisRange.max)
         
         // Sometimes results in "negative zero"
         if(value == 0) {
@@ -291,10 +356,9 @@ internal class ReferenceLineDrawingView : UIView {
     }
     
     private func calculateYPositionForYAxisValue(value: Double) -> CGFloat {
-        
         // Just an algebraic re-arrangement of calculateYAxisValue
         let graphHeight = self.frame.size.height - (topMargin + bottomMargin)
-        var y = ((CGFloat(value - self.currentRange.max) / CGFloat(self.currentRange.min - self.currentRange.max)) * graphHeight) + topMargin
+        var y = ((CGFloat(value - self.currentYAxisRange.max) / CGFloat(self.currentYAxisRange.min - self.currentYAxisRange.max)) * graphHeight) + topMargin
         
         if (y == 0) {
             y = 0
@@ -302,6 +366,19 @@ internal class ReferenceLineDrawingView : UIView {
         
         return y
     }
+
+
+    // Added to support vertical reference lines
+    private func calculateXPositionForXAxisValue(value: Int) -> CGFloat {
+        // Just an algebraic re-arrangement of calculateXAxisValue
+        let graphWidth = self.frame.size.width
+        var x = ((CGFloat(value - self.currentXAxisRange.max) / CGFloat(self.currentXAxisRange.min - self.currentXAxisRange.max)) * graphWidth) + leftMargin
+        if (x == 0) {
+            x = 0
+        }
+        return x
+    }
+
     
     private func createLabel(withText text: String) -> UILabel {
         let label = UILabel()
@@ -316,9 +393,16 @@ internal class ReferenceLineDrawingView : UIView {
     // Public functions to update the reference lines with any changes to the range and viewport (phone rotation, etc).
     // When the range changes, need to update the max for the new range, then update all the labels that are showing for the axis and redraw the reference lines.
     func set(range: (min: Double, max: Double)) {
-        self.currentRange = range
+        switch self.settings.referenceLineOrientation {
+        case .Horizontal:
+            self.currentYAxisRange = range
+        case .Vertical:
+            self.currentXAxisRange.min = Int(range.min.rounded())
+            self.currentXAxisRange.max = Int(range.max.rounded())
+        }
         self.referenceLineLayer.path = createReferenceLinesPath().cgPath
     }
+
     
     func set(viewportWidth: CGFloat, viewportHeight: CGFloat) {
         self.frame.size.width = viewportWidth

@@ -90,7 +90,11 @@ import UIKit
     
     // Reference Lines
     private var referenceLineView: ReferenceLineDrawingView?
-    
+
+    // Custom Sublayers
+    private var customSublayers: [ScrollableGraphViewDrawingLayer?] = []
+    private var customView: UIView?
+
     // Labels
     private var labelsView = UIView()
     private var labelPool = LabelPool()
@@ -441,7 +445,6 @@ import UIKit
     }
     
     public func addReferenceLines(referenceLines: ReferenceLines) {
-        
         // If we aren't setup yet, just save the reference lines and the setup will take care of it.
         if(isInitialSetup) {
             self.referenceLines = referenceLines
@@ -451,7 +454,30 @@ import UIKit
             addReferenceLinesToGraph(referenceLines: referenceLines)
         }
     }
-    
+
+    public func addCustomSublayers(sublayers: [ScrollableGraphViewDrawingLayer?]) {
+        // If we aren't setup yet, just save the custom layers and the setup will take care of it.
+        if(isInitialSetup) {
+            self.customSublayers = sublayers
+        }
+        // Otherwise, add the reference lines, reload everything.
+        else {
+            addCustomSublayersToGraph(sublayers: sublayers)
+        }
+    }
+
+    public func addCustomView(view: UIView) {
+        let viewport = CGRect(x: 0, y: 0, width: viewportWidth, height: viewportHeight)
+        var referenceLineBottomMargin = bottomMargin
+
+        self.customView?.removeFromSuperview()
+
+        //Customize the view using this' data
+        //self.customView?.set(range: self.range)
+        view.frame = viewport
+        self.addSubview(view)
+    }
+
     // Limitation: Can only be used when reloading the same number of data points!
     public func reload() {
         stopAnimations()
@@ -481,6 +507,12 @@ import UIKit
         addReferenceViewDrawingView()
         
         updateLabelsForCurrentInterval()
+    }
+
+    private func addCustomSublayersToGraph(sublayers: [ScrollableGraphViewDrawingLayer?]) {
+        self.customSublayers = sublayers
+        //Update
+        self.addSubLayers(layers: self.customSublayers)
     }
     
     private func initPlot(plot: Plot, activePointsInterval: CountableRange<Int>) {
