@@ -27,6 +27,8 @@
 		298BFD591F121BB00062F5C8 /* ReferenceLines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD471F121BB00062F5C8 /* ReferenceLines.swift */; };
 		298BFD5A1F121BB00062F5C8 /* ScrollableGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */; };
 		D74709182013EA1900CBA121 /* PlotPointData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74709172013EA1900CBA121 /* PlotPointData.swift */; };
+		D747091A2013F70300CBA121 /* AnnotationPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74709192013F70300CBA121 /* AnnotationPlot.swift */; };
+		D747091C2013F74300CBA121 /* AnnotationDrawingLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +54,8 @@
 		298BFD471F121BB00062F5C8 /* ReferenceLines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceLines.swift; sourceTree = "<group>"; };
 		298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableGraphView.swift; sourceTree = "<group>"; };
 		D74709172013EA1900CBA121 /* PlotPointData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotPointData.swift; sourceTree = "<group>"; };
+		D74709192013F70300CBA121 /* AnnotationPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationPlot.swift; sourceTree = "<group>"; };
+		D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationDrawingLayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				298BFD331F121BB00062F5C8 /* BarDrawingLayer.swift */,
+				D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */,
 				298BFD341F121BB00062F5C8 /* DotDrawingLayer.swift */,
 				298BFD351F121BB00062F5C8 /* FillDrawingLayer.swift */,
 				298BFD361F121BB00062F5C8 /* GradientDrawingLayer.swift */,
@@ -125,6 +130,7 @@
 				298BFD3E1F121BB00062F5C8 /* BarPlot.swift */,
 				298BFD3F1F121BB00062F5C8 /* DotPlot.swift */,
 				298BFD401F121BB00062F5C8 /* LinePlot.swift */,
+				D74709192013F70300CBA121 /* AnnotationPlot.swift */,
 				298BFD411F121BB00062F5C8 /* Plot.swift */,
 			);
 			path = Plots;
@@ -250,6 +256,8 @@
 				298BFD4D1F121BB00062F5C8 /* LineDrawingLayer.swift in Sources */,
 				298BFD491F121BB00062F5C8 /* BarDrawingLayer.swift in Sources */,
 				298BFD4F1F121BB00062F5C8 /* ScrollableGraphViewDrawingLayer.swift in Sources */,
+				D747091C2013F74300CBA121 /* AnnotationDrawingLayer.swift in Sources */,
+				D747091A2013F70300CBA121 /* AnnotationPlot.swift in Sources */,
 				298BFD4E1F121BB00062F5C8 /* ReferenceLineDrawingView.swift in Sources */,
 				298BFD591F121BB00062F5C8 /* ReferenceLines.swift in Sources */,
 				298BFD511F121BB00062F5C8 /* GraphPointAnimation.swift in Sources */,
