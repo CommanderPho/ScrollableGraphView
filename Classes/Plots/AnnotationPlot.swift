@@ -24,6 +24,8 @@ open class AnnotationPlot : Plot {
     /// Whether the bars should be drawn with rounded corners
     open var shouldRoundBarCorners: Bool = false
 
+    open var shouldDrawDayBoxes: Bool = false
+
     // Private State
     // #############
 
@@ -46,7 +48,8 @@ open class AnnotationPlot : Plot {
             barColor: barColor,
             barLineWidth: barLineWidth,
             barLineColor: barLineColor,
-            shouldRoundCorners: shouldRoundBarCorners)
+            shouldRoundCorners: shouldRoundBarCorners,
+            shouldDrawDayBoxes: shouldDrawDayBoxes)
 
         annotationLayer?.owner = self
     }

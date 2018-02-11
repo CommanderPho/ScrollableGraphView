@@ -103,6 +103,9 @@ import UIKit
             }
         }
     }
+
+    // Delegate
+    open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
     
     // Active Points & Range Calculation
     private var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
@@ -692,6 +695,14 @@ import UIKit
             for plot in plots {
                 let newData = getData(forPlot: plot, andNewlyActivatedPoints: activatedPoints)
                 plot.setPlotPointDataValues(forNewlyActivatedPoints: activatedPoints, withData: newData)
+                if let validGraphDelegate = self.graphViewDelegate {
+                    for aDeactivatedPoint in deactivatedPoints {
+                        validGraphDelegate.scrollableGraphView(self, didEndDisplaying: aDeactivatedPoint, forPlot: plot)
+                    }
+                    for anActivatedPoint in activatedPoints {
+                        validGraphDelegate.scrollableGraphView(self, didEndDisplaying: anActivatedPoint, forPlot: plot)
+                    }
+                }
             }
         }
         

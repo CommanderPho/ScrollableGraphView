@@ -14,8 +14,10 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
     private var annotationPath = UIBezierPath()
     private var annotationWidth: CGFloat = 4
     private var shouldRoundCorners = false
+    private var shouldDrawDayBoxes = false
 
-    init(frame: CGRect, barWidth: CGFloat, barColor: UIColor, barLineWidth: CGFloat, barLineColor: UIColor, shouldRoundCorners: Bool) {
+
+    init(frame: CGRect, barWidth: CGFloat, barColor: UIColor, barLineWidth: CGFloat, barLineColor: UIColor, shouldRoundCorners: Bool, shouldDrawDayBoxes: Bool) {
         super.init(viewportWidth: frame.size.width, viewportHeight: frame.size.height)
 
         self.annotationWidth = barWidth
@@ -23,7 +25,7 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
         self.strokeColor = barLineColor.cgColor
         self.fillColor = barColor.cgColor
         self.shouldRoundCorners = shouldRoundCorners
-
+        self.shouldDrawDayBoxes = shouldDrawDayBoxes
         self.lineJoin = lineJoin
         self.lineCap = lineCap
     }
