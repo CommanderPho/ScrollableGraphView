@@ -209,7 +209,8 @@ import UIKit
         // Calculate the points that we will be able to see when the view loads.
         
         let initialActivePointsInterval = calculateActivePointsInterval()
-        
+        self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: initialActivePointsInterval.map{$0})
+
         // 4.
         // Add the plots to the graph, we need these to calculate the range.
         
@@ -363,7 +364,8 @@ import UIKit
             let newActivePointsInterval = calculateActivePointsInterval()
             self.previousActivePointsInterval = self.activePointsInterval
             self.activePointsInterval = newActivePointsInterval
-            
+            self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: newActivePointsInterval.map{$0})
+
             // If adaption is enabled we want to
             if(shouldAdaptRange) {
                 // TODO: This is currently called every single frame...
