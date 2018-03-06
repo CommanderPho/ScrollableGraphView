@@ -823,8 +823,27 @@ import UIKit
         for point in activatedPoints {
             let label = labelPool.activateLabel(forPointIndex: point)
             
-            label.text = (dataSource?.label(atIndex: point) ?? "")
-            label.textColor = (dataSource?.labelColor(atIndex: point) ?? ref.dataPointLabelColor)
+//            label.text = (dataSource?.label(atIndex: point) ?? "")
+
+            if let validDataSource  = self.dataSource {
+                // Required Datasource Methods
+                label.text = validDataSource.label(atIndex: point)
+
+                // Optional Datasource Methods
+                if let specifiedLabelColor = validDataSource.labelColor(atIndex: point) {
+                    label.textColor = specifiedLabelColor
+                }
+                else {
+                    label.textColor = ref.dataPointLabelColor
+                }
+            }
+            else {
+                // No datasource
+                label.text = ""
+                label.textColor = ref.dataPointLabelColor
+            }
+
+//            label.textColor = (dataSource?.labelColor(atIndex: point) ?? ref.dataPointLabelColor)
 //            label.textColor = ref.dataPointLabelColor
             label.font = ref.dataPointLabelFont
             
