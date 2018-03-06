@@ -824,7 +824,8 @@ import UIKit
             let label = labelPool.activateLabel(forPointIndex: point)
             
             label.text = (dataSource?.label(atIndex: point) ?? "")
-            label.textColor = ref.dataPointLabelColor
+            label.textColor = (dataSource?.labelColor(atIndex: point) ?? ref.dataPointLabelColor)
+//            label.textColor = ref.dataPointLabelColor
             label.font = ref.dataPointLabelFont
             
             label.sizeToFit()
