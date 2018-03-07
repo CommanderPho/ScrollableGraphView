@@ -1084,22 +1084,24 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
 
 
 fileprivate extension UIScrollView {
-    func screenshot() -> UIImage? {
-        let savedContentOffset = contentOffset
-        let savedFrame = frame
 
-        UIGraphicsBeginImageContext(contentSize)
-        contentOffset = .zero
-        frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
+    // Screenshots
+    func screenshot() -> UIImage? {
+        let savedContentOffset = self.contentOffset
+        let savedFrame = self.frame
+
+        UIGraphicsBeginImageContext(self.contentSize)
+        self.contentOffset = .zero
+        self.frame = CGRect(x: 0, y: 0, width: self.contentSize.width, height: self.contentSize.height)
 
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
 
-        layer.render(in: context)
+        self.layer.render(in: context)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext();
 
-        contentOffset = savedContentOffset
-        frame = savedFrame
+        self.contentOffset = savedContentOffset
+        self.frame = savedFrame
 
         return image
     }
