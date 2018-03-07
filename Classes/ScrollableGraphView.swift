@@ -104,6 +104,26 @@ import UIKit
         }
     }
 
+
+    public struct ViewportInfo {
+        public let width: CGFloat
+        public let height: CGFloat
+        public let offset: (x: CGFloat, y: CGFloat)
+        public let totalGraphWidth: CGFloat
+
+        public var percentGraphDisplayed: CGFloat {
+            return (self.width / self.totalGraphWidth)
+        }
+        public var percentContentXOffset: CGFloat {
+            return (self.offset.x / self.totalGraphWidth)
+        }
+
+    }
+    // Returns the current size and offset of the viewport
+    open var viewportInfo: ViewportInfo {
+        return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
+    }
+
     // Delegate
     open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
     
@@ -381,7 +401,9 @@ import UIKit
     private func updateOffsetWidths() {
         drawingView.frame.origin.x = offsetWidth
         drawingView.bounds.origin.x = offsetWidth
-        
+
+        self.graphViewDelegate?.scrollableGraphView(self, didUpdateViewportOffset: (self.offsetWidth/self.totalGraphWidth))
+
         updateOffsetsForGradients(offsetWidth: offsetWidth)
         
         referenceLineView?.frame.origin.x = offsetWidth
@@ -843,8 +865,6 @@ import UIKit
                 label.textColor = ref.dataPointLabelColor
             }
 
-//            label.textColor = (dataSource?.labelColor(atIndex: point) ?? ref.dataPointLabelColor)
-//            label.textColor = ref.dataPointLabelColor
             label.font = ref.dataPointLabelFont
             
             label.sizeToFit()

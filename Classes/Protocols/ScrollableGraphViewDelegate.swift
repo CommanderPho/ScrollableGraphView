@@ -16,4 +16,17 @@ public protocol ScrollableGraphViewDelegate: class {
 
     // doesn't have a plot variable because it's shared among all plots
     func scrollableGraphView(_ scrollableGraphView: ScrollableGraphView, batchUpdateActivePoints pointIndicies: [Int])
+
+
+    // Optional
+    func scrollableGraphView(_ scrollableGraphView: ScrollableGraphView, didUpdateViewportOffset newPercentOffset: CGFloat)
+}
+
+
+
+public extension ScrollableGraphViewDelegate {
+
+    func scrollableGraphView(_ scrollableGraphView: ScrollableGraphView, didUpdateViewportOffset newPercentOffset: CGFloat) {
+        return
+    }
 }
