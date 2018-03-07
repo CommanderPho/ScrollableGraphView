@@ -665,10 +665,18 @@ import UIKit
     }
     
     private func graphWidth(forNumberOfDataPoints numberOfPoints: Int) -> CGFloat {
-        let width: CGFloat = (CGFloat(numberOfPoints - 1) * dataPointSpacing) + (leftmostPointPadding + rightmostPointPadding)
+        let width: CGFloat = (CGFloat(numberOfPoints - 1) * self.dataPointSpacing) + (leftmostPointPadding + rightmostPointPadding)
         return width
     }
-    
+
+    // Basically does the inverse of private func graphWidth(forNumberOfDataPoints numberOfPoints: Int) -> CGFloat
+    // For a given GRAPH width, and a fixed number of datapoints, it determines that datapoint spacing required to satisfy these conditions.
+    private func getDatapointSpacing(forDesiredGraphWidth desiredGraphWidth: CGFloat, forNumberOfDataPoints numberOfPoints: Int) -> CGFloat {
+        let desiredDatapointSpacing: CGFloat = ((desiredGraphWidth - (self.leftmostPointPadding + self.rightmostPointPadding)) / CGFloat(numberOfPoints - 1))
+        return desiredDatapointSpacing
+    }
+
+
     private func clamp<T: Comparable>(value:T, min:T, max:T) -> T {
         if (value < min) {
             return min
@@ -995,10 +1003,29 @@ import UIKit
     }
 
     public func captureGraphScreenshot() -> UIImage? {
+        // Reduce the datapoint spacing to achieve unit width: meaning the entire graph fits exactly in the viewport window with all points rendered.
+        let previousDatapointSpacing: CGFloat = self.dataPointSpacing
+        let previousDelegate: ScrollableGraphViewDelegate? = self.graphViewDelegate
+        let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
+//        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
+//        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+        let newRequiredDatapointSpacing: CGFloat = self.getDatapointSpacing(forDesiredGraphWidth: self.viewportWidth, forNumberOfDataPoints: numberOfDataPoints)
+
+        // Remove the delegate so we don't get callbacks during the screenshot
+        self.graphViewDelegate = nil
+        // Reload with the new dataPoint spacing
+        self.dataPointSpacing = newRequiredDatapointSpacing
+        self.reload()
+
         //Screenshot here
-        guard let validScreenshot = self.screenshot() else {
-            return nil
-        }
+        let validScreenshot: UIImage? = self.screenshot()
+
+        //Revert the graph to the user's settings
+        self.dataPointSpacing = previousDatapointSpacing
+        self.reload()
+        // Restore the delegate once the screenshot is done
+        self.graphViewDelegate = previousDelegate
+
         return validScreenshot
     }
 }
