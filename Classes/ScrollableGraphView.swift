@@ -993,6 +993,14 @@ import UIKit
             }
         }
     }
+
+    public func captureGraphScreenshot() -> UIImage? {
+        //Screenshot here
+        guard let validScreenshot = self.screenshot() else {
+            return nil
+        }
+        return validScreenshot
+    }
 }
 
 // MARK: - ScrollableGraphView Settings Enums
@@ -1074,3 +1082,29 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
 }
 #endif
 
+
+fileprivate extension UIScrollView {
+    func screenshot() -> UIImage? {
+        let savedContentOffset = contentOffset
+        let savedFrame = frame
+
+        UIGraphicsBeginImageContext(contentSize)
+        contentOffset = .zero
+        frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
+
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+
+        layer.render(in: context)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+
+        contentOffset = savedContentOffset
+        frame = savedFrame
+
+        return image
+    }
+}
+
+public extension ScrollableGraphView {
+
+}
