@@ -1009,15 +1009,19 @@ import UIKit
         let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
 //        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
 //        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+
+        // Determines the datapoint spacing required to exactly fill the width of the viewport
         let newRequiredDatapointSpacing: CGFloat = self.getDatapointSpacing(forDesiredGraphWidth: self.viewportWidth, forNumberOfDataPoints: numberOfDataPoints)
 
         // Remove the delegate so we don't get callbacks during the screenshot
         self.graphViewDelegate = nil
         // Reload with the new dataPoint spacing
         self.dataPointSpacing = newRequiredDatapointSpacing
+        // Reload the graph with new datapoint spacing
         self.reload()
 
         //Screenshot here
+//        self.drawingView.snapshotView(afterScreenUpdates: true)
         let validScreenshot: UIImage? = self.screenshot()
 
         //Revert the graph to the user's settings
