@@ -8,6 +8,8 @@ public protocol ScrollableGraphViewDataSource {
 
     // Optional Methods:
     func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool
+    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor?
+
     func labelColor(atIndex pointIndex: Int) -> UIColor?
 }
 
@@ -21,6 +23,11 @@ extension ScrollableGraphViewDataSource {
     func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool {
         return true
     }
+
+    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor? {
+        return nil
+    }
+
 
     func labelColor(atIndex pointIndex: Int) -> UIColor? {
         return nil

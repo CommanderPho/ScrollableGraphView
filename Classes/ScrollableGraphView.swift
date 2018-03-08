@@ -696,6 +696,7 @@ import UIKit
             var dataForIndexI = PlotPointData()
             dataForIndexI.value = dataSource?.value(forPlot: plot, atIndex: i) ?? 0
             dataForIndexI.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: i) ?? false
+            dataForIndexI.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: i)
             dataForInterval.append(dataForIndexI)
         }
         return dataForInterval
@@ -707,6 +708,7 @@ import UIKit
             var dataForActivatedPoint = PlotPointData()
             dataForActivatedPoint.value = dataSource?.value(forPlot: plot, atIndex: activatedPoint) ?? 0
             dataForActivatedPoint.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: activatedPoint) ?? false
+            dataForActivatedPoint.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: activatedPoint)
             dataForActivatedPoints.append(dataForActivatedPoint)
         }
         return dataForActivatedPoints

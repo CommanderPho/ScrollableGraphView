@@ -209,9 +209,13 @@ open class Plot {
         // For any visible points, kickoff the animation to their new position after the axis' min/max has changed.
         var dataIndex = 0
         for pointIndex in pointsToAnimate {
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: data[dataIndex].value)
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: data[dataIndex].value) //TODO: why is this not data[pointIndex]??? I think it's because the only data passed in is the data corresponding to each of the pointsToAnimate
             let point = graphPoints[pointIndex]
             animate(point: point, to: newPosition, withDelay: Double(dataIndex) * delay)
+            // Update the other parameters instantly (no animation)
+            point.colorOverride = data[dataIndex].colorOverride
+            point.isVisible = data[dataIndex].isVisible
+
             dataIndex += 1
         }
     }
