@@ -67,13 +67,29 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
         for i in activePointsInterval {
 
             var location = CGPoint.zero
+            var isVisible: Bool = false
+            var colorOveride: UIColor? = nil
 
-            if let pointLocation = owner?.graphPoint(forIndex: i).location {
-                location = pointLocation
+            if let point = owner?.graphPoint(forIndex: i) {
+                location = point.location
+                isVisible = point.isVisible
+                colorOveride = point.colorOverride
             }
-
-            let pointPath = createBarPath(centre: location)
-            annotationPath.append(pointPath)
+            let pointPath: UIBezierPath
+            if (isVisible) {
+                pointPath = createBarPath(centre: location)
+                annotationPath.append(pointPath)
+            }
+//            if let pointVisibility = owner?.graphPoint(forIndex: i).isVisible {
+//                if (pointVisibility) {
+//                    if let pointLocation = owner?.graphPoint(forIndex: i).location {
+//                        location = pointLocation
+//                    }
+//                    let pointPath = createBarPath(centre: location)
+//                    annotationPath.append(pointPath)
+//                }
+//
+//            }
         }
         return annotationPath
     }

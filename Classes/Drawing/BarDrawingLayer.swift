@@ -58,13 +58,27 @@ internal class BarDrawingLayer: ScrollableGraphViewDrawingLayer {
         for i in activePointsInterval {
             
             var location = CGPoint.zero
-            
-            if let pointLocation = owner?.graphPoint(forIndex: i).location {
-                location = pointLocation
+            var isVisible: Bool = false
+            var colorOveride: UIColor? = nil
+
+            if let point = owner?.graphPoint(forIndex: i) {
+                location = point.location
+                isVisible = point.isVisible
+                colorOveride = point.colorOverride
             }
-            
-            let pointPath = createBarPath(centre: location)
-            barPath.append(pointPath)
+            let pointPath: UIBezierPath
+            if (isVisible) {
+                pointPath = createBarPath(centre: location)
+                barPath.append(pointPath)
+            }
+
+
+//            if let pointLocation = owner?.graphPoint(forIndex: i).location {
+//                location = pointLocation
+//            }
+//
+//            let pointPath = createBarPath(centre: location)
+//            barPath.append(pointPath)
         }
         
         return barPath
