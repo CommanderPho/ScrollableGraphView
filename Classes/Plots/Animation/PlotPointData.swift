@@ -9,7 +9,17 @@
 import Foundation
 
 internal struct PlotPointData {
-    var value: Double = 0.0
-    var isVisible: Bool = false
+
+    var value: Double? = nil
+
+    private var _isVisible: Bool = false
+    var isVisible: Bool {
+        get {
+            return (self._isVisible && (self.value != nil))
+        }
+        set {
+            self._isVisible = newValue
+        }
+    }
     var colorOverride: UIColor? = nil
 }

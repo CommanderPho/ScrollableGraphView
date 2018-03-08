@@ -75,13 +75,11 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
             let pointPath = createBarPath(centre: location)
             annotationPath.append(pointPath)
         }
-
         return annotationPath
     }
 
     override func updatePath() {
-
-        self.path = createPath ().cgPath
+        self.path = createPath().cgPath
     }
 }
 

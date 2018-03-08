@@ -622,18 +622,19 @@ import UIKit
         }
     }
     
-    private func calculateRange<T: Collection>(for data: T) -> (min: Double, max: Double) where T.Iterator.Element == Double {
+    private func calculateRange<T: Collection>(for data: T) -> (min: Double, max: Double) where T.Iterator.Element == Double? {
         
         var rangeMin: Double = Double(Int.max)
         var rangeMax: Double = Double(Int.min)
         
         for dataPoint in data {
-            if (dataPoint > rangeMax) {
-                rangeMax = dataPoint
-            }
-            
-            if (dataPoint < rangeMin) {
-                rangeMin = dataPoint
+            if let validDataPoint = dataPoint {
+                if (validDataPoint > rangeMax) {
+                    rangeMax = validDataPoint
+                }
+                if (validDataPoint < rangeMin) {
+                    rangeMin = validDataPoint
+                }
             }
         }
         return (min: rangeMin, max: rangeMax)
@@ -694,7 +695,7 @@ import UIKit
         var dataForInterval = [PlotPointData]()
         for i in activeInterval.startIndex ..< activeInterval.endIndex {
             var dataForIndexI = PlotPointData()
-            dataForIndexI.value = dataSource?.value(forPlot: plot, atIndex: i) ?? 0
+            dataForIndexI.value = dataSource?.value(forPlot: plot, atIndex: i)
             dataForIndexI.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: i) ?? false
             dataForIndexI.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: i)
             dataForInterval.append(dataForIndexI)
@@ -706,7 +707,7 @@ import UIKit
         var dataForActivatedPoints = [PlotPointData]()
         for activatedPoint in activatedPoints {
             var dataForActivatedPoint = PlotPointData()
-            dataForActivatedPoint.value = dataSource?.value(forPlot: plot, atIndex: activatedPoint) ?? 0
+            dataForActivatedPoint.value = dataSource?.value(forPlot: plot, atIndex: activatedPoint)
             dataForActivatedPoint.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: activatedPoint) ?? false
             dataForActivatedPoint.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: activatedPoint)
             dataForActivatedPoints.append(dataForActivatedPoint)

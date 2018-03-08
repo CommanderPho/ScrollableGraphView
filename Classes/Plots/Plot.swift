@@ -167,11 +167,13 @@ open class Plot {
             // data positions: 0...10 = // 0 to (end - start)
             let dataPosition = i - newPoints.startIndex
             let currData = data[dataPosition]
-            let value = currData.value
+            let currValue: Double
+            if let validValue = currData.value { currValue = validValue }
+            else { currValue = 0.0 }
             let isVisible = currData.isVisible
             let color = currData.colorOverride
             
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: value)
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: currValue)
             graphPoints[i].x = newPosition.x
             graphPoints[i].y = newPosition.y
             graphPoints[i].isVisible = isVisible
@@ -187,11 +189,14 @@ open class Plot {
         
             let dataPosition = index
             let currData = data[dataPosition]
-            let value = currData.value
+            let currValue: Double
+            if let validValue = currData.value { currValue = validValue }
+            else { currValue = 0.0 }
+
             let isVisible = currData.isVisible
             let color = currData.colorOverride
 
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: activatedPointIndex, value: value)
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: activatedPointIndex, value: currValue)
             graphPoints[activatedPointIndex].x = newPosition.x
             graphPoints[activatedPointIndex].y = newPosition.y
             graphPoints[activatedPointIndex].isVisible = isVisible
@@ -209,13 +214,14 @@ open class Plot {
         // For any visible points, kickoff the animation to their new position after the axis' min/max has changed.
         var dataIndex = 0
         for pointIndex in pointsToAnimate {
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: data[dataIndex].value) //TODO: why is this not data[pointIndex]??? I think it's because the only data passed in is the data corresponding to each of the pointsToAnimate
-            let point = graphPoints[pointIndex]
-            animate(point: point, to: newPosition, withDelay: Double(dataIndex) * delay)
+            let currValue: Double
+            if let validValue = data[dataIndex].value { currValue = validValue }
+            else { currValue = 0.0 }
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: currValue) //TODO: why is this not data[pointIndex]??? I think it's because the only data passed in is the data corresponding to each of the pointsToAnimate
+            animate(point: graphPoints[pointIndex], to: newPosition, withDelay: Double(dataIndex) * delay)
             // Update the other parameters instantly (no animation)
-            point.colorOverride = data[dataIndex].colorOverride
-            point.isVisible = data[dataIndex].isVisible
-
+            graphPoints[pointIndex].colorOverride = data[dataIndex].colorOverride
+            graphPoints[pointIndex].isVisible = data[dataIndex].isVisible
             dataIndex += 1
         }
     }

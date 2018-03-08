@@ -29,9 +29,7 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
         dataPointPath.removeAllPoints()
         
         // We can only move forward if we can get the data we need from the delegate.
-        guard let
-            activePointsInterval = self.owner?.graphViewDrawingDelegate?.intervalForActivePoints()
-            else {
+        guard let activePointsInterval = self.owner?.graphViewDrawingDelegate?.intervalForActivePoints() else {
                 return dataPointPath
         }
         
@@ -48,9 +46,12 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
                 isVisible = point.isVisible
                 colorOveride = point.colorOverride
             }
-
-            let pointPath = pointPathCreator(location, isVisible, colorOveride)
-            dataPointPath.append(pointPath)
+            let pointPath: UIBezierPath
+            if (isVisible) {
+                pointPath = pointPathCreator(location, isVisible, colorOveride)
+                dataPointPath.append(pointPath)
+            }
+            // otherwise just skip it
         }
         
         return dataPointPath
