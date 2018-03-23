@@ -124,6 +124,16 @@ import UIKit
         return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
     }
 
+    public func getDrawingView() -> UIView {
+        return self.drawingView
+    }
+    public func getReferenceLinesView() -> UIView? {
+        return self.referenceLineView
+    }
+    public func getLabelsView() -> UIView {
+        return self.labelsView
+    }
+
     // Delegate
     open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
     
