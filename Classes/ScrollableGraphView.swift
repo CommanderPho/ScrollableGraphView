@@ -175,9 +175,47 @@ import UIKit
         let referenceLines = ReferenceLines()
         self.addReferenceLines(referenceLines: referenceLines)
     }
-    
+
+
+    public func reset() {
+        self.stopAnimations()
+        self.graphViewDelegate = nil
+        self.plots.removeAll()
+        self.referenceLineView?.removeFromSuperview()
+        self.labelsView.removeFromSuperview()
+        self.drawingView.removeFromSuperview()
+
+        self.referenceLines = nil
+
+        self.isInitialSetup = true
+        self.isCurrentlySettingUp = false
+
+        self.viewportWidth = 0
+        self.viewportHeight = 0
+        self.totalGraphWidth = 0
+        self.offsetWidth = 0
+        // Graph Line
+        self.zeroYPosition = 0
+        // Graph Drawing
+        self.drawingView = UIView()
+        self.plots = [Plot]()
+
+        // Reference Lines
+        self.referenceLineView = nil
+
+        // Labels
+        self.labelsView = UIView()
+        self.labelPool = LabelPool()
+
+        // Data Source
+        self.dataSource = nil
+        // Active Points & Range Calculation
+        self.previousActivePointsInterval = -1 ..< -1
+        self.activePointsInterval = -1 ..< -1
+        self.range = (0, 100)
+    }
+
     private func setup() {
-        
         clipsToBounds = true
         isCurrentlySettingUp = true
         
@@ -193,8 +231,8 @@ import UIKit
         // Add the subviews we will use to draw everything.
         
         // Add the drawing view in which we draw all the plots.
-        drawingView = UIView(frame: viewport)
-        drawingView.backgroundColor = backgroundFillColor
+        self.drawingView = UIView(frame: viewport)
+        self.drawingView.backgroundColor = backgroundFillColor
         self.addSubview(drawingView)
         
         // Add the x-axis labels view.
@@ -205,8 +243,8 @@ import UIKit
         
         // Calculate the drawing frames
         let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
-        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
-        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+        self.totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
+        self.contentSize = CGSize(width: self.totalGraphWidth, height: self.viewportHeight)
         
         // Scrolling direction.
         
@@ -234,9 +272,9 @@ import UIKit
         // 4.
         // Add the plots to the graph, we need these to calculate the range.
         
-        while(queuedPlots.count > 0) {
-            if let plot = queuedPlots.dequeue() {
-                addPlotToGraph(plot: plot, activePointsInterval: initialActivePointsInterval)
+        while(self.queuedPlots.count > 0) {
+            if let plot = self.queuedPlots.dequeue() {
+                self.addPlotToGraph(plot: plot, activePointsInterval: initialActivePointsInterval)
             }
         }
         
@@ -458,12 +496,12 @@ import UIKit
     
     public func addPlot(plot: Plot) {
         // If we aren't setup yet, save the plot to be added during setup.
-        if(isInitialSetup) {
+        if(self.isInitialSetup) {
             enqueuePlot(plot)
         }
         // Otherwise, just add the plot directly.
         else {
-            addPlotToGraph(plot: plot, activePointsInterval: self.activePointsInterval)
+            self.addPlotToGraph(plot: plot, activePointsInterval: self.activePointsInterval)
         }
     }
     
@@ -478,7 +516,8 @@ import UIKit
             addReferenceLinesToGraph(referenceLines: referenceLines)
         }
     }
-    
+
+
     // Limitation: Can only be used when reloading the same number of data points!
     public func reload() {
         stopAnimations()
@@ -502,7 +541,17 @@ import UIKit
         initPlot(plot: plot, activePointsInterval: activePointsInterval)
         startAnimations(withStaggerValue: 0.15)
     }
-    
+
+
+//    private func removePlotFromGraph(plot: Plot, activePointsInterval: CountableRange<Int>) {
+//        plot.graphViewDrawingDelegate = nil
+//        if let validIndex = self.plots.index(where: {return ($0.identifier == plot.identifier)}) {
+//            self.plots.remove(at: validIndex)
+//        }
+//        initPlot(plot: plot, activePointsInterval: activePointsInterval)
+////        startAnimations(withStaggerValue: 0.15)
+//    }
+
     private func addReferenceLinesToGraph(referenceLines: ReferenceLines) {
         self.referenceLines = referenceLines
         addReferenceViewDrawingView()
@@ -1117,7 +1166,7 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
 #endif
 
 
-fileprivate extension UIScrollView {
+public extension UIScrollView {
 
     // Screenshots
     func screenshot() -> UIImage? {
