@@ -245,6 +245,12 @@ open class Plot {
     }
 }
 
+extension Plot: Equatable {
+    public static func ==(lhs: Plot, rhs: Plot) -> Bool {
+        return (lhs.identifier == rhs.identifier)
+    }
+}
+
 @objc public enum ScrollableGraphViewAnimationType : Int {
     case easeOut
     case elastic
