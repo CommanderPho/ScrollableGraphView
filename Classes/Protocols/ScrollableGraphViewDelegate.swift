@@ -24,7 +24,7 @@ public protocol ScrollableGraphViewDelegate: class {
 
 
 
-public extension ScrollableGraphViewDelegate {
+extension ScrollableGraphViewDelegate {
 
     func scrollableGraphView(_ scrollableGraphView: ScrollableGraphView, didUpdateViewportOffset newPercentOffset: CGFloat) {
         return

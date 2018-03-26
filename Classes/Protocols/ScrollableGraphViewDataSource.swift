@@ -20,7 +20,7 @@ public protocol ScrollableGraphViewDataSource {
 
 
 // Optional Protocol Implementations
-extension ScrollableGraphViewDataSource {
+public extension ScrollableGraphViewDataSource {
     func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool {
         return true
     }
