@@ -71,18 +71,18 @@ import UIKit
     private var isInitialSetup = true
     private var isCurrentlySettingUp = false
     
-    private var viewportWidth: CGFloat = 0 {
+    internal var viewportWidth: CGFloat = 0 {
         didSet { if(oldValue != viewportWidth) { viewportDidChange() }}
     }
-    private var viewportHeight: CGFloat = 0 {
+    internal var viewportHeight: CGFloat = 0 {
         didSet { if(oldValue != viewportHeight) { viewportDidChange() }}
     }
     
-    private var totalGraphWidth: CGFloat = 0
-    private var offsetWidth: CGFloat = 0
+    internal var totalGraphWidth: CGFloat = 0
+    internal var offsetWidth: CGFloat = 0
     
     // Graph Line
-    private var zeroYPosition: CGFloat = 0
+    internal var zeroYPosition: CGFloat = 0
     
     // Graph Drawing
     private var drawingView = UIView()
@@ -105,20 +105,6 @@ import UIKit
     }
 
 
-    public struct ViewportInfo {
-        public let width: CGFloat
-        public let height: CGFloat
-        public let offset: (x: CGFloat, y: CGFloat)
-        public let totalGraphWidth: CGFloat
-
-        public var percentGraphDisplayed: CGFloat {
-            return (self.width / self.totalGraphWidth)
-        }
-        public var percentContentXOffset: CGFloat {
-            return (self.offset.x / self.totalGraphWidth)
-        }
-
-    }
     // Returns the current size and offset of the viewport
     open var viewportInfo: ViewportInfo {
         return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
@@ -424,7 +410,7 @@ import UIKit
             
             // If the scrollview has scrolled anywhere, we need to update the offset
             // and move around our drawing views.
-            offsetWidth = self.contentOffset.x
+            self.offsetWidth = self.contentOffset.x
             updateOffsetWidths()
             
             // Recalculate active points for this size.

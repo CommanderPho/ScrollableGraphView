@@ -18,14 +18,16 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
 
 
     init(frame: CGRect, barWidth: CGFloat, barColor: UIColor, barLineWidth: CGFloat, barLineColor: UIColor, shouldRoundCorners: Bool, shouldDrawDayBoxes: Bool) {
-        super.init(viewportWidth: frame.size.width, viewportHeight: frame.size.height)
 
         self.annotationWidth = barWidth
+        self.shouldRoundCorners = shouldRoundCorners
+        self.shouldDrawDayBoxes = shouldDrawDayBoxes
+
+        super.init(viewportWidth: frame.size.width, viewportHeight: frame.size.height)
+
         self.lineWidth = barLineWidth
         self.strokeColor = barLineColor.cgColor
         self.fillColor = barColor.cgColor
-        self.shouldRoundCorners = shouldRoundCorners
-        self.shouldDrawDayBoxes = shouldDrawDayBoxes
         self.lineJoin = lineJoin
         self.lineCap = lineCap
     }
@@ -33,6 +35,13 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override init(layer: Any) {
+        super.init(layer: layer)
+    }
+
+
+
 
     private func createBarPath(centre: CGPoint) -> UIBezierPath {
 

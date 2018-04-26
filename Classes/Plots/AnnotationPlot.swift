@@ -37,12 +37,12 @@ open class AnnotationPlot : Plot {
     }
 
     override func layers(forViewport viewport: CGRect) -> [ScrollableGraphViewDrawingLayer?] {
-        createLayers(viewport: viewport)
-        return [annotationLayer]
+        self.createLayers(viewport: viewport)
+        return [self.annotationLayer]
     }
 
     private func createLayers(viewport: CGRect) {
-        annotationLayer = AnnotationDrawingLayer(
+        self.annotationLayer = AnnotationDrawingLayer(
             frame: viewport,
             barWidth: barWidth,
             barColor: barColor,
@@ -51,6 +51,6 @@ open class AnnotationPlot : Plot {
             shouldRoundCorners: shouldRoundBarCorners,
             shouldDrawDayBoxes: shouldDrawDayBoxes)
 
-        annotationLayer?.owner = self
+        self.annotationLayer?.owner = self
     }
 }
