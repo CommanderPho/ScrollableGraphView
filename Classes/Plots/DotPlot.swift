@@ -13,7 +13,7 @@ open class DotPlot : Plot {
     /// The colour with which to fill the shape.
     open var dataPointFillColor: UIColor = UIColor.black
     /// If dataPointType is set to .Custom then you,can provide a closure to create any kind of shape you would like to be displayed instead of just a circle or square. The closure takes a CGPoint which is the centre of the shape and it should return a complete UIBezierPath.
-    open var customDataPointPath: ((_ centre: CGPoint) -> UIBezierPath)?
+    open var customDataPointPath: ((_ centre: CGPoint, _ isVisible: Bool, _ colorOverride: UIColor?) -> UIBezierPath)?
     
     // Private State
     // #############

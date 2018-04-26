@@ -26,6 +26,11 @@
 		298BFD581F121BB00062F5C8 /* LabelPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD461F121BB00062F5C8 /* LabelPool.swift */; };
 		298BFD591F121BB00062F5C8 /* ReferenceLines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD471F121BB00062F5C8 /* ReferenceLines.swift */; };
 		298BFD5A1F121BB00062F5C8 /* ScrollableGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */; };
+		D74709182013EA1900CBA121 /* PlotPointData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74709172013EA1900CBA121 /* PlotPointData.swift */; };
+		D747091A2013F70300CBA121 /* AnnotationPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74709192013F70300CBA121 /* AnnotationPlot.swift */; };
+		D747091C2013F74300CBA121 /* AnnotationDrawingLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */; };
+		D7E923E02030A8BF00072217 /* ScrollableGraphViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E923DF2030A8BF00072217 /* ScrollableGraphViewDelegate.swift */; };
+		D7FC1F2020914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FC1F1F20914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +55,11 @@
 		298BFD461F121BB00062F5C8 /* LabelPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelPool.swift; sourceTree = "<group>"; };
 		298BFD471F121BB00062F5C8 /* ReferenceLines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferenceLines.swift; sourceTree = "<group>"; };
 		298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableGraphView.swift; sourceTree = "<group>"; };
+		D74709172013EA1900CBA121 /* PlotPointData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotPointData.swift; sourceTree = "<group>"; };
+		D74709192013F70300CBA121 /* AnnotationPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationPlot.swift; sourceTree = "<group>"; };
+		D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationDrawingLayer.swift; sourceTree = "<group>"; };
+		D7E923DF2030A8BF00072217 /* ScrollableGraphViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableGraphViewDelegate.swift; sourceTree = "<group>"; };
+		D7FC1F1F20914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollableGraphView-ViewportExtensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +107,7 @@
 				298BFD421F121BB00062F5C8 /* Protocols */,
 				298BFD451F121BB00062F5C8 /* Reference */,
 				298BFD481F121BB00062F5C8 /* ScrollableGraphView.swift */,
+				D7FC1F1F20914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift */,
 			);
 			name = Classes;
 			path = ../../Classes;
@@ -106,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				298BFD331F121BB00062F5C8 /* BarDrawingLayer.swift */,
+				D747091B2013F74300CBA121 /* AnnotationDrawingLayer.swift */,
 				298BFD341F121BB00062F5C8 /* DotDrawingLayer.swift */,
 				298BFD351F121BB00062F5C8 /* FillDrawingLayer.swift */,
 				298BFD361F121BB00062F5C8 /* GradientDrawingLayer.swift */,
@@ -123,6 +135,7 @@
 				298BFD3E1F121BB00062F5C8 /* BarPlot.swift */,
 				298BFD3F1F121BB00062F5C8 /* DotPlot.swift */,
 				298BFD401F121BB00062F5C8 /* LinePlot.swift */,
+				D74709192013F70300CBA121 /* AnnotationPlot.swift */,
 				298BFD411F121BB00062F5C8 /* Plot.swift */,
 			);
 			path = Plots;
@@ -131,6 +144,7 @@
 		298BFD3B1F121BB00062F5C8 /* Animation */ = {
 			isa = PBXGroup;
 			children = (
+				D74709172013EA1900CBA121 /* PlotPointData.swift */,
 				298BFD3C1F121BB00062F5C8 /* GraphPoint.swift */,
 				298BFD3D1F121BB00062F5C8 /* GraphPointAnimation.swift */,
 			);
@@ -142,6 +156,7 @@
 			children = (
 				298BFD431F121BB00062F5C8 /* ScrollableGraphViewDataSource.swift */,
 				298BFD441F121BB00062F5C8 /* ScrollableGraphViewDrawingDelegate.swift */,
+				D7E923DF2030A8BF00072217 /* ScrollableGraphViewDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -242,13 +257,18 @@
 				298BFD4C1F121BB00062F5C8 /* GradientDrawingLayer.swift in Sources */,
 				298BFD4A1F121BB00062F5C8 /* DotDrawingLayer.swift in Sources */,
 				298BFD521F121BB00062F5C8 /* BarPlot.swift in Sources */,
+				D74709182013EA1900CBA121 /* PlotPointData.swift in Sources */,
 				298BFD4B1F121BB00062F5C8 /* FillDrawingLayer.swift in Sources */,
 				298BFD4D1F121BB00062F5C8 /* LineDrawingLayer.swift in Sources */,
 				298BFD491F121BB00062F5C8 /* BarDrawingLayer.swift in Sources */,
 				298BFD4F1F121BB00062F5C8 /* ScrollableGraphViewDrawingLayer.swift in Sources */,
+				D747091C2013F74300CBA121 /* AnnotationDrawingLayer.swift in Sources */,
+				D747091A2013F70300CBA121 /* AnnotationPlot.swift in Sources */,
 				298BFD4E1F121BB00062F5C8 /* ReferenceLineDrawingView.swift in Sources */,
 				298BFD591F121BB00062F5C8 /* ReferenceLines.swift in Sources */,
+				D7E923E02030A8BF00072217 /* ScrollableGraphViewDelegate.swift in Sources */,
 				298BFD511F121BB00062F5C8 /* GraphPointAnimation.swift in Sources */,
+				D7FC1F2020914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift in Sources */,
 				298BFD531F121BB00062F5C8 /* DotPlot.swift in Sources */,
 				298BFD5A1F121BB00062F5C8 /* ScrollableGraphView.swift in Sources */,
 				298BFD501F121BB00062F5C8 /* GraphPoint.swift in Sources */,
@@ -414,6 +434,7 @@
 				298BFD301F121BA10062F5C8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -22,18 +22,9 @@ open class ReferenceLines {
             }
         }
     }
-    @IBInspectable var referenceLineOrientation_: Int {
-        get { return referenceLineOrientation.rawValue }
-        set {
-            if let enumValue = ScrollableGraphViewReferenceLineOrientation(rawValue: newValue) {
-                referenceLineOrientation = enumValue
-            }
-        }
-    }
     /// Where the labels should be displayed on the reference lines.
     open var referenceLinePosition = ScrollableGraphViewReferenceLinePosition.left
-    open var referenceLineOrientation = ScrollableGraphViewReferenceLineOrientation.Horizontal
-
+    
     @IBInspectable open var positionType = ReferenceLinePositioningType.relative
     @IBInspectable open var relativePositions: [Double] = [0.25, 0.5, 0.75]
     @IBInspectable open var absolutePositions: [Double] = [25, 50, 75]
@@ -96,8 +87,4 @@ open class ReferenceLines {
 
 @objc public enum ScrollableGraphViewReferenceLineType : Int {
     case cover
-}
-
-@objc public enum ScrollableGraphViewReferenceLineOrientation: Int {
-    case Horizontal, Vertical
 }
