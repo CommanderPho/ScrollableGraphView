@@ -124,8 +124,8 @@ import UIKit
     open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
     
     // Active Points & Range Calculation
-    private var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
-    private var activePointsInterval: CountableRange<Int> = -1 ..< -1 {
+    internal var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
+    internal var activePointsInterval: CountableRange<Int> = -1 ..< -1 {
         didSet {
             if(oldValue.lowerBound != activePointsInterval.lowerBound || oldValue.upperBound != activePointsInterval.upperBound) {
                 if !isCurrentlySettingUp { activePointsDidChange() }
@@ -133,7 +133,7 @@ import UIKit
         }
     }
     
-    private var range: (min: Double, max: Double) = (0, 100) {
+    internal var range: (min: Double, max: Double) = (0, 100) {
         didSet {
             if(oldValue.min != range.min || oldValue.max != range.max) {
                 if !isCurrentlySettingUp { rangeDidChange() }

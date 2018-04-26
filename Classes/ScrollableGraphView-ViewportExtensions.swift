@@ -27,9 +27,59 @@ public extension ScrollableGraphView {
 
     }
 
+    public enum RangeLocation {
+        case Min, Center, Max
+    }
+
+    public func calculatePosition(forPlot plot: Plot, atIndex index: Int) -> CGPoint {
+        let position: CGPoint
+
+        guard let validValue = dataSource?.value(forPlot: plot, atIndex: index) else {
+            // self.range.min is the current ranges minimum that has been detected
+            // self.rangeMin is the minimum that should be used as specified by the user
+            let rangeMin = (shouldAdaptRange) ? self.range.min : self.rangeMin
+            position = self.calculatePosition(atIndex: index, value: rangeMin)
+            return position
+        }
+        position = self.calculatePosition(atIndex: index, value: validValue)
+        //        CGRect(origin: CGPoint(x: position.x - label.frame.width / 2, y: position.y + ref.dataPointLabelTopMargin), size: label.frame.size)
+        return position
+    }
 
 
 
+
+
+    public func calculateLocation(ofRangePosition position: RangeLocation, atIndex index: Int) -> CGPoint {
+        let value: Double
+
+        switch position {
+        case .Min:
+            // self.range.min is the current ranges minimum that has been detected
+            // self.rangeMin is the minimum that should be used as specified by the user
+            let rangeMin = (shouldAdaptRange) ? self.range.min : self.rangeMin
+            value = rangeMin
+
+        case .Center:
+            let rangeMin = (shouldAdaptRange) ? self.range.min : self.rangeMin
+            let rangeMax = (shouldAdaptRange) ? self.range.max : self.rangeMax
+            let rangeMagnitude = (rangeMax - rangeMin)
+            let rangeCenterOffsetY = (rangeMagnitude / 2.0)
+            value = rangeMin + rangeCenterOffsetY
+
+        case .Max:
+            // self.range.max is the current ranges maximum that has been detected
+            // self.rangeMax is the maximum that should be used as specified by the user
+            let rangeMax = (shouldAdaptRange) ? self.range.max : self.rangeMax
+            value = rangeMax
+
+        }
+
+        let position = self.calculatePosition(atIndex: index, value: rangeMin)
+//        CGRect(origin: CGPoint(x: position.x - label.frame.width / 2, y: position.y + ref.dataPointLabelTopMargin), size: label.frame.size)
+        //self.calculatePosition(atIndex: index, value: )
+        return position
+    }
 
 
 
