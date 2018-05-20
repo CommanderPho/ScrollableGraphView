@@ -26,11 +26,15 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         // Setup
         self.fillColor = UIColor.clear.cgColor // This is handled by the fill drawing layer.
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+//    override init(layer: Any) {
+//        fatalError("init(layer:) has not been implemented")
+//    }
+
     internal func createLinePath() -> UIBezierPath {
         
         guard let owner = owner else {
