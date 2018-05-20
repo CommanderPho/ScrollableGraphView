@@ -35,7 +35,7 @@ open class LinePlot : Plot {
 
     //[nil, [2,3], [10, 5, 5, 5]]
     open var lineDashPattern: [NSNumber]? = nil
-    open var disconnectByZeros: Bool = false
+//    open var disconnectByZeros: Bool = false
 
     
     // Fill Settings
@@ -97,7 +97,7 @@ open class LinePlot : Plot {
     private func createLayers(viewport: CGRect) {
         
         // Create the line drawing layer.
-        lineLayer = LineDrawingLayer(frame: viewport, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness, lineDashPattern: lineDashPattern, shouldIsolateSubpaths: self.disconnectByZeros)
+        lineLayer = LineDrawingLayer(frame: viewport, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness, lineDashPattern: lineDashPattern)
         lineLayer?.name = "\(self.identifier).lineLayer"
         // Depending on whether we want to fill with solid or gradient, create the layer accordingly.
         
