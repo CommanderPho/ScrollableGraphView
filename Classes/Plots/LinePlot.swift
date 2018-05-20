@@ -93,7 +93,7 @@ open class LinePlot : Plot {
         
         // Create the line drawing layer.
         lineLayer = LineDrawingLayer(frame: viewport, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness)
-        
+        lineLayer?.name = "\(self.identifier).lineLayer"
         // Depending on whether we want to fill with solid or gradient, create the layer accordingly.
         
         // Gradient and Fills
@@ -103,11 +103,13 @@ open class LinePlot : Plot {
             if(shouldFill) {
                 // Setup fill
                 fillLayer = FillDrawingLayer(frame: viewport, fillColor: fillColor, lineDrawingLayer: lineLayer!)
+                fillLayer?.name = "\(self.identifier).fillLayer"
             }
             
         case .gradient:
             if(shouldFill) {
                 gradientLayer = GradientDrawingLayer(frame: viewport, startColor: fillGradientStartColor, endColor: fillGradientEndColor, gradientType: fillGradientType, lineDrawingLayer: lineLayer!)
+                gradientLayer?.name = "\(self.identifier).gradientFillLayer"
             }
         }
         

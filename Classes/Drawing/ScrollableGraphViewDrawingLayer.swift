@@ -19,7 +19,7 @@ internal class ScrollableGraphViewDrawingLayer : CAShapeLayer {
     
     init(viewportWidth: CGFloat, viewportHeight: CGFloat, offset: CGFloat = 0) {
         super.init()
-        
+
         self.viewportWidth = viewportWidth
         self.viewportHeight = viewportHeight
         
@@ -28,14 +28,19 @@ internal class ScrollableGraphViewDrawingLayer : CAShapeLayer {
         setup()
     }
 
+//    override init() {
+//        super.init()
+//    }
+//
     override init(layer: Any) {
-        super.init(layer: layer)
+        fatalError("init(layer:) has not been implemented")
+//        super.init(layer: layer)
     }
-
+//
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setup() {
         // Get rid of any animations.
         self.actions = ["position" : NSNull(), "bounds" : NSNull()]
