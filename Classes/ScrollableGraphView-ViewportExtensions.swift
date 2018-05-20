@@ -132,11 +132,20 @@ public extension ScrollableGraphView {
         return ScrollableGraphView.absoluteXOffset(absolutePercentOffset: absolutePercentOffset, totalGraphWidth: self.totalGraphWidth)
     }
 
+    // Calculates the absoluteXOffset from the relative offset
+    public func absoluteXOffset(viewportRelativeXOffset: CGFloat) -> CGFloat {
+        let currContentOffset = self.contentOffset
+        return (viewportRelativeXOffset + currContentOffset.x)
+    }
 
 
 
 
-
+    // Calculates the relative offset from the absoluteXOffset
+    public func viewportRelativeXOffset(absoluteXOffset: CGFloat) -> CGFloat {
+        let currContentOffset = self.contentOffset
+        return (absoluteXOffset - currContentOffset.x)
+    }
 
 
 
@@ -153,6 +162,8 @@ public extension ScrollableGraphView {
         let fractionalQuanta: CGFloat = CGFloat(totalNumberOfQuanta - 1) * absolutePercentOffset
         return Int(round(fractionalQuanta))
     }
+
+
 
 
 }

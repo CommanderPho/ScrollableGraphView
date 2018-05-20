@@ -229,9 +229,12 @@ import UIKit
         // Add the drawing view in which we draw all the plots.
         self.drawingView = UIView(frame: viewport)
         self.drawingView.backgroundColor = backgroundFillColor
+        self.drawingView.accessibilityIdentifier = "drawingView"
         self.addSubview(drawingView)
         
         // Add the x-axis labels view.
+        self.labelsView.accessibilityIdentifier = "labelsView"
+        self.drawingView.accessibilityIdentifier = "drawingView"
         self.insertSubview(labelsView, aboveSubview: drawingView)
         
         // 2.
@@ -352,9 +355,10 @@ import UIKit
                 referenceLineColor: referenceLines.referenceLineColor,
                 referenceLineThickness: referenceLines.referenceLineThickness,
                 referenceLineSettings: referenceLines)
-            
+
+            self.referenceLineView?.accessibilityIdentifier = "referenceLineView"
             referenceLineView?.set(range: self.range)
-            
+
             self.addSubview(referenceLineView!)
         }
     }
