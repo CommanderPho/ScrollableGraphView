@@ -9,7 +9,7 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
     private var shouldFill: Bool
     private var lineCurviness: CGFloat
     
-    init(frame: CGRect, lineWidth: CGFloat, lineColor: UIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat) {
+    init(frame: CGRect, lineWidth: CGFloat, lineColor: UIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat, lineDashPattern: [NSNumber]? = nil) {
         
         self.lineStyle = lineStyle
         self.shouldFill = shouldFill
@@ -19,6 +19,7 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         
         self.lineWidth = lineWidth
         self.strokeColor = lineColor.cgColor
+        self.lineDashPattern = lineDashPattern
         
         self.lineJoin = lineJoin
         self.lineCap = lineCap

@@ -21,7 +21,7 @@ open class LinePlot : Plot {
             }
         }
     }
-    
+
     /// Whether or not the line should be rendered using bezier curves are straight lines.
     open var lineStyle = ScrollableGraphViewLineStyle.straight
     
@@ -31,7 +31,12 @@ open class LinePlot : Plot {
     /// The line caps. Takes any of the Core Animation LineCap values.
     open var lineCap: String = kCALineCapRound
     open var lineCurviness: CGFloat = 0.5
-    
+
+
+    //[nil, [2,3], [10, 5, 5, 5]]
+    open var lineDashPattern: [NSNumber]? = nil
+    open var disconnectByZeros: Bool = false
+
     
     // Fill Settings
     // #############
@@ -92,7 +97,7 @@ open class LinePlot : Plot {
     private func createLayers(viewport: CGRect) {
         
         // Create the line drawing layer.
-        lineLayer = LineDrawingLayer(frame: viewport, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness)
+        lineLayer = LineDrawingLayer(frame: viewport, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness, lineDashPattern: lineDashPattern, shouldIsolateSubpaths: self.disconnectByZeros)
         lineLayer?.name = "\(self.identifier).lineLayer"
         // Depending on whether we want to fill with solid or gradient, create the layer accordingly.
         
