@@ -84,10 +84,16 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         // Connect each point on the graph with a segment.
         for i in activePointsInterval.lowerBound ..< activePointsInterval.upperBound - 1 {
             
-            let startPoint = owner.graphPoint(forIndex: i).location
-            let endPoint = owner.graphPoint(forIndex: i+1).location
-            
-            pathSegmentAdder(startPoint, endPoint, currentLinePath)
+            let startPoint = owner.graphPoint(forIndex: i)
+            let endPoint = owner.graphPoint(forIndex: i+1)
+
+            if (!(startPoint.isVisible || endPoint.isVisible)) {
+//                currentLinePath.move(to: startPoint.location)
+                currentLinePath.move(to: endPoint.location)
+                continue
+            }
+            pathSegmentAdder(startPoint.location, endPoint.location, currentLinePath)
+
         }
         
         // Connect the line to the ending edge if we are filling it.
