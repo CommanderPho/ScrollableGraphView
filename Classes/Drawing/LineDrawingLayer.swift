@@ -87,8 +87,8 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
             let startPoint = owner.graphPoint(forIndex: i)
             let endPoint = owner.graphPoint(forIndex: i+1)
 
+            // Skip the invisible points, just move to the next one
             if (!(startPoint.isVisible || endPoint.isVisible)) {
-//                currentLinePath.move(to: startPoint.location)
                 currentLinePath.move(to: endPoint.location)
                 continue
             }
