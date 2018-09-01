@@ -19,12 +19,9 @@ internal class ScrollableGraphViewDrawingLayer : CAShapeLayer {
     
     init(viewportWidth: CGFloat, viewportHeight: CGFloat, offset: CGFloat = 0) {
         super.init()
-
         self.viewportWidth = viewportWidth
         self.viewportHeight = viewportHeight
-        
         self.frame = CGRect(origin: CGPoint(x: offset, y: 0), size: CGSize(width: self.viewportWidth, height: self.viewportHeight))
-        
         setup()
     }
 
