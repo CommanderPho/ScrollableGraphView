@@ -85,21 +85,33 @@
     internal var totalGraphWidth: CGFloat = 0
     internal var offsetWidth: CGFloat = 0
     
-    // Graph Line
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Graph Line
+    // zeroYPosition: Where the 0.0 y-axis value is currently represented on the graph in terms of position.
     internal var zeroYPosition: CGFloat = 0
     
-    // Graph Drawing
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Graph Drawing
+    // drawingView: the drawing view is the view upon which all of the plots are drawn
     private var drawingView = ScrollableGraphViewNSUI.NSUIView()
     private var plots: [Plot] = [Plot]()
-    
-    // Reference Lines
+
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Reference Lines
     private var referenceLineView: ReferenceLineDrawingView?
-    
-    // Labels
+
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Labels
     private var labelsView = ScrollableGraphViewNSUI.NSUIView()
     private var labelPool = LabelPool()
     
-    // Data Source
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Data Source
     open var dataSource: ScrollableGraphViewDataSource? {
         didSet {
             if(plots.count > 0) {
@@ -108,12 +120,14 @@
         }
     }
 
-
     // Returns the current size and offset of the viewport
     open var viewportInfo: ViewportInfo {
         return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
     }
 
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - View Getter Functions
     public func getDrawingView() -> ScrollableGraphViewNSUI.NSUIView {
         return self.drawingView
     }
@@ -124,10 +138,15 @@
         return self.labelsView
     }
 
-    // Delegate
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Delegate
     open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
-    
-    // Active Points & Range Calculation
+
+
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Active Points & Range Calculation
     internal var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
     internal var activePointsInterval: CountableRange<Int> = -1 ..< -1 {
         didSet {
@@ -136,7 +155,8 @@
             }
         }
     }
-    
+
+    // The range of y-axis values
     internal var range: (min: Double, max: Double) = (0, 100) {
         didSet {
             if(oldValue.min != range.min || oldValue.max != range.max) {
@@ -175,7 +195,6 @@
         let referenceLines = ReferenceLines()
         self.addReferenceLines(referenceLines: referenceLines)
     }
-
 
     public func reset() {
         self.stopAnimations()
@@ -318,55 +337,9 @@
         // Set the first active points interval. These are the points that are visible when the view loads.
         self.activePointsInterval = initialActivePointsInterval
     }
-    
-    // TODO in 4.1: Plot layer ordering.
-    // TODO in 4.1: Plot removal.
-    private func addDrawingLayersForPlots(inViewport viewport: CGRect) {
-        for plot in plots {
-            addSubLayers(layers: plot.layers(forViewport: viewport))
-        }
-    }
-    
-    private func addSubLayers(layers: [ScrollableGraphViewDrawingLayer?]) {
-        for layer in layers {
-            if let layer = layer {
-                drawingView.layer.addSublayer(layer)
-            }
-        }
-    }
-    
-    private func addReferenceViewDrawingView() {
-        
-        guard let referenceLines = self.referenceLines else {
-            // We can want to add this if the settings arent nil.
-            return
-        }
-        
-        if(referenceLines.shouldShowReferenceLines) {
-            let viewport = CGRect(x: 0, y: 0, width: viewportWidth, height: viewportHeight)
-            var referenceLineBottomMargin = bottomMargin
-            
-            // Have to adjust the bottom line if we are showing data point labels (x-axis).
-            if(referenceLines.shouldShowLabels && referenceLines.dataPointLabelFont != nil) {
-                referenceLineBottomMargin += (referenceLines.dataPointLabelFont!.pointSize + referenceLines.dataPointLabelTopMargin + referenceLines.dataPointLabelBottomMargin)
-            }
-            
-            referenceLineView?.removeFromSuperview()
-            referenceLineView = ReferenceLineDrawingView(
-                frame: viewport,
-                topMargin: topMargin,
-                bottomMargin: referenceLineBottomMargin,
-                referenceLineColor: referenceLines.referenceLineColor,
-                referenceLineThickness: referenceLines.referenceLineThickness,
-                referenceLineSettings: referenceLines)
 
-            self.referenceLineView?.accessibilityIdentifier = "referenceLineView"
-            referenceLineView?.set(range: self.range)
 
-            self.addSubview(referenceLineView!)
-        }
-    }
-    
+
     // If the view has changed we have to make sure we're still displaying the right data.
     override open func layoutSubviews() {
         super.layoutSubviews()
@@ -387,114 +360,8 @@
             updateUI()
         }
     }
-    
-    private func updateUI() {
-        
-        // Make sure we have data, if don't, just get out. We can't do anything without any data.
-        guard let dataSource = dataSource else {
-            return
-        }
-        
-        guard dataSource.numberOfPoints() > 0 else {
-            return
-        }
-        
-        if (isInitialSetup) {
-            setup()
-            
-            if(shouldAnimateOnStartup) {
-                startAnimations(withStaggerValue: 0.15)
-            }
-            
-            // We're done setting up.
-            isInitialSetup = false
-        }
-            // Otherwise, the user is just scrolling and we just need to update everything.
-        else {
-            // Needs to update the viewportWidth and viewportHeight which is used to calculate which
-            // points we can actually see.
-            viewportWidth = self.frame.width
-            viewportHeight = self.frame.height
-            
-            // If the scrollview has scrolled anywhere, we need to update the offset
-            // and move around our drawing views.
-            self.offsetWidth = self.contentOffset.x
-            updateOffsetWidths()
-            
-            // Recalculate active points for this size.
-            // Recalculate range for active points.
-            let newActivePointsInterval = calculateActivePointsInterval()
-            self.previousActivePointsInterval = self.activePointsInterval
-            self.activePointsInterval = newActivePointsInterval
-            self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: newActivePointsInterval.map{$0})
 
-            // If adaption is enabled we want to
-            if(shouldAdaptRange) {
-                // TODO: This is currently called every single frame...
-                // We need to only calculate the range if the active points interval has changed!
-                #if !TARGET_INTERFACE_BUILDER
-                    let newRange = calculateRange(forActivePointsInterval: newActivePointsInterval)
-                    self.range = newRange
-                #endif
-            }
-        }
-    }
-    
-    private func updateOffsetWidths() {
-        drawingView.frame.origin.x = offsetWidth
-        drawingView.bounds.origin.x = offsetWidth
 
-        self.graphViewDelegate?.scrollableGraphView(self, didUpdateViewportOffset: (self.offsetWidth/self.totalGraphWidth))
-
-        updateOffsetsForGradients(offsetWidth: offsetWidth)
-        
-        referenceLineView?.frame.origin.x = offsetWidth
-    }
-    
-    private func updateOffsetsForGradients(offsetWidth: CGFloat) {
-        guard let sublayers = drawingView.layer.sublayers else {
-            return
-        }
-        
-        for layer in sublayers {
-            switch(layer) {
-            case let layer as GradientDrawingLayer:
-                layer.offset = offsetWidth
-            default: break
-            }
-        }
-    }
-    
-    private func updateFrames() {
-        // Drawing view needs to always be the same size as the scrollview.
-        drawingView.frame.size.width = viewportWidth
-        drawingView.frame.size.height = viewportHeight
-        
-        // Gradient should extend over the entire viewport
-        updateFramesForGradientLayers(viewportWidth: viewportWidth, viewportHeight: viewportHeight)
-        
-        // Reference lines should extend over the entire viewport
-        referenceLineView?.set(viewportWidth: viewportWidth, viewportHeight: viewportHeight)
-        
-        self.contentSize.height = viewportHeight
-    }
-    
-    private func updateFramesForGradientLayers(viewportWidth: CGFloat, viewportHeight: CGFloat) {
-        
-        guard let sublayers = drawingView.layer.sublayers else {
-            return
-        }
-        
-        for layer in sublayers {
-            switch(layer) {
-            case let layer as GradientDrawingLayer:
-                layer.frame.size.width = viewportWidth
-                layer.frame.size.height = viewportHeight
-            default: break
-            }
-        }
-    }
-    
     // MARK: - Public Methods
     // ######################
 
@@ -532,10 +399,64 @@
         updatePaths()
         updateLabelsForCurrentInterval()
     }
-    
+
+    // MARK: - Private Methods
+    // #######################
+
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Add Element Functions
+    // TODO in 4.1: Plot layer ordering.
+    // TODO in 4.1: Plot removal.
+    private func addDrawingLayersForPlots(inViewport viewport: CGRect) {
+        for plot in plots {
+            addSubLayers(layers: plot.layers(forViewport: viewport))
+        }
+    }
+
+    private func addSubLayers(layers: [ScrollableGraphViewDrawingLayer?]) {
+        for layer in layers {
+            if let layer = layer {
+                drawingView.layer.addSublayer(layer)
+            }
+        }
+    }
+
+    private func addReferenceViewDrawingView() {
+
+        guard let referenceLines = self.referenceLines else {
+            // We can want to add this if the settings arent nil.
+            return
+        }
+
+        if(referenceLines.shouldShowReferenceLines) {
+            let viewport = CGRect(x: 0, y: 0, width: viewportWidth, height: viewportHeight)
+            var referenceLineBottomMargin = bottomMargin
+
+            // Have to adjust the bottom line if we are showing data point labels (x-axis).
+            if(referenceLines.shouldShowLabels && referenceLines.dataPointLabelFont != nil) {
+                referenceLineBottomMargin += (referenceLines.dataPointLabelFont!.pointSize + referenceLines.dataPointLabelTopMargin + referenceLines.dataPointLabelBottomMargin)
+            }
+
+            referenceLineView?.removeFromSuperview()
+            referenceLineView = ReferenceLineDrawingView(
+                frame: viewport,
+                topMargin: topMargin,
+                bottomMargin: referenceLineBottomMargin,
+                referenceLineColor: referenceLines.referenceLineColor,
+                referenceLineThickness: referenceLines.referenceLineThickness,
+                referenceLineSettings: referenceLines)
+
+            self.referenceLineView?.accessibilityIdentifier = "referenceLineView"
+            referenceLineView?.set(range: self.range)
+
+            self.addSubview(referenceLineView!)
+        }
+    }
+
     // The functions for adding plots and reference lines need to be able to add plots
-    // both before and after the graph knows its viewport/size. 
-    // This needs to be the case so we can use it in interface builder as well as 
+    // both before and after the graph knows its viewport/size.
+    // This needs to be the case so we can use it in interface builder as well as
     // just adding it programatically.
     // These functions add the plots and reference lines to the graph.
     // The public functions will either save the plots and reference lines (in the case
@@ -549,49 +470,159 @@
     }
 
 
-//    private func removePlotFromGraph(plot: Plot, activePointsInterval: CountableRange<Int>) {
-//        plot.graphViewDrawingDelegate = nil
-//        if let validIndex = self.plots.index(where: {return ($0.identifier == plot.identifier)}) {
-//            self.plots.remove(at: validIndex)
-//        }
-//        initPlot(plot: plot, activePointsInterval: activePointsInterval)
-////        startAnimations(withStaggerValue: 0.15)
-//    }
+    //    private func removePlotFromGraph(plot: Plot, activePointsInterval: CountableRange<Int>) {
+    //        plot.graphViewDrawingDelegate = nil
+    //        if let validIndex = self.plots.index(where: {return ($0.identifier == plot.identifier)}) {
+    //            self.plots.remove(at: validIndex)
+    //        }
+    //        initPlot(plot: plot, activePointsInterval: activePointsInterval)
+    ////        startAnimations(withStaggerValue: 0.15)
+    //    }
 
     private func addReferenceLinesToGraph(referenceLines: ReferenceLines) {
         self.referenceLines = referenceLines
         addReferenceViewDrawingView()
-        
+
         updateLabelsForCurrentInterval()
     }
-    
+
     private func initPlot(plot: Plot, activePointsInterval: CountableRange<Int>) {
-        
+
         #if !TARGET_INTERFACE_BUILDER
-            plot.setup() // Only init the animations for plots if we are not in IB
+        plot.setup() // Only init the animations for plots if we are not in IB
         #endif
-        
+
         plot.createPlotPoints(numberOfPoints: dataSource!.numberOfPoints(), range: range) // TODO: removed forced unwrap
-        
+
         // If we are not animating on startup then just set all the plot positions to their respective values
         if(!shouldAnimateOnStartup) {
             let dataForInitialPoints = getData(forPlot: plot, andActiveInterval: activePointsInterval)
             plot.setPlotPointDataValues(forNewlyActivatedPoints: activePointsInterval, withData: dataForInitialPoints)
         }
-        
+
         addSubLayers(layers: plot.layers(forViewport: currentViewport()))
     }
 
     private var queuedPlots: SGVQueue<Plot> = SGVQueue<Plot>()
-    
+
     private func enqueuePlot(_ plot: Plot) {
         queuedPlots.enqueue(element: plot)
     }
 
-    
-    // MARK: - Private Methods
-    // #######################
-    
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Update Element Functions
+
+    private func updateUI() {
+
+        // Make sure we have data, if don't, just get out. We can't do anything without any data.
+        guard let dataSource = dataSource else {
+            return
+        }
+
+        guard dataSource.numberOfPoints() > 0 else {
+            return
+        }
+
+        if (isInitialSetup) {
+            setup()
+
+            if(shouldAnimateOnStartup) {
+                startAnimations(withStaggerValue: 0.15)
+            }
+
+            // We're done setting up.
+            isInitialSetup = false
+        }
+            // Otherwise, the user is just scrolling and we just need to update everything.
+        else {
+            // Needs to update the viewportWidth and viewportHeight which is used to calculate which
+            // points we can actually see.
+            viewportWidth = self.frame.width
+            viewportHeight = self.frame.height
+
+            // If the scrollview has scrolled anywhere, we need to update the offset
+            // and move around our drawing views.
+            self.offsetWidth = self.contentOffset.x
+            updateOffsetWidths()
+
+            // Recalculate active points for this size.
+            // Recalculate range for active points.
+            let newActivePointsInterval = calculateActivePointsInterval()
+            self.previousActivePointsInterval = self.activePointsInterval
+            self.activePointsInterval = newActivePointsInterval
+            self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: newActivePointsInterval.map{$0})
+
+            // If adaption is enabled we want to
+            if(shouldAdaptRange) {
+                // TODO: This is currently called every single frame...
+                // We need to only calculate the range if the active points interval has changed!
+                #if !TARGET_INTERFACE_BUILDER
+                let newRange = calculateRange(forActivePointsInterval: newActivePointsInterval)
+                self.range = newRange
+                #endif
+            }
+        }
+    }
+
+    private func updateOffsetWidths() {
+        drawingView.frame.origin.x = offsetWidth
+        drawingView.bounds.origin.x = offsetWidth
+
+        self.graphViewDelegate?.scrollableGraphView(self, didUpdateViewportOffset: (self.offsetWidth/self.totalGraphWidth))
+
+        updateOffsetsForGradients(offsetWidth: offsetWidth)
+
+        referenceLineView?.frame.origin.x = offsetWidth
+    }
+
+    private func updateOffsetsForGradients(offsetWidth: CGFloat) {
+        guard let sublayers = drawingView.layer.sublayers else {
+            return
+        }
+
+        for layer in sublayers {
+            switch(layer) {
+            case let layer as GradientDrawingLayer:
+                layer.offset = offsetWidth
+            default: break
+            }
+        }
+    }
+
+
+    private func updateFrames() {
+        // Drawing view needs to always be the same size as the scrollview.
+        drawingView.frame.size.width = viewportWidth
+        drawingView.frame.size.height = viewportHeight
+
+        // Gradient should extend over the entire viewport
+        updateFramesForGradientLayers(viewportWidth: viewportWidth, viewportHeight: viewportHeight)
+
+        // Reference lines should extend over the entire viewport
+        referenceLineView?.set(viewportWidth: viewportWidth, viewportHeight: viewportHeight)
+
+        self.contentSize.height = viewportHeight
+    }
+
+
+    private func updateFramesForGradientLayers(viewportWidth: CGFloat, viewportHeight: CGFloat) {
+
+        guard let sublayers = drawingView.layer.sublayers else {
+            return
+        }
+
+        for layer in sublayers {
+            switch(layer) {
+            case let layer as GradientDrawingLayer:
+                layer.frame.size.width = viewportWidth
+                layer.frame.size.height = viewportHeight
+            default: break
+            }
+        }
+    }
+
+
     // MARK: Layout Calculations
     // #########################
     
@@ -770,6 +801,26 @@
         return dataForActivatedPoints
     }
 
+    // Returns the indices of any points that became inactive (that is, "off screen"). (No order)
+    private func determineDeactivatedPoints() -> [Int] {
+        let prevSet = Set(previousActivePointsInterval)
+        let currSet = Set(activePointsInterval)
+
+        let deactivatedPoints = prevSet.subtracting(currSet)
+
+        return Array(deactivatedPoints)
+    }
+
+    // Returns the indices of any points that became active (on screen). (No order)
+    private func determineActivatedPoints() -> [Int] {
+        let prevSet = Set(previousActivePointsInterval)
+        let currSet = Set(activePointsInterval)
+
+        let activatedPoints = currSet.subtracting(prevSet)
+
+        return Array(activatedPoints)
+    }
+
     // MARK: Events
     // ############
     
@@ -785,6 +836,7 @@
             for plot in plots {
                 let newData = getData(forPlot: plot, andNewlyActivatedPoints: activatedPoints)
                 plot.setPlotPointDataValues(forNewlyActivatedPoints: activatedPoints, withData: newData)
+                //TODO: Improve call efficiency of delegate calls if possible
                 if let validGraphDelegate = self.graphViewDelegate {
                     for aDeactivatedPoint in deactivatedPoints {
                         validGraphDelegate.scrollableGraphView(self, didEndDisplaying: aDeactivatedPoint, forPlot: plot)
@@ -849,27 +901,11 @@
         }
     }
     
-    // Returns the indices of any points that became inactive (that is, "off screen"). (No order)
-    private func determineDeactivatedPoints() -> [Int] {
-        let prevSet = Set(previousActivePointsInterval)
-        let currSet = Set(activePointsInterval)
-        
-        let deactivatedPoints = prevSet.subtracting(currSet)
-        
-        return Array(deactivatedPoints)
-    }
+
     
-    // Returns the indices of any points that became active (on screen). (No order)
-    private func determineActivatedPoints() -> [Int] {
-        let prevSet = Set(previousActivePointsInterval)
-        let currSet = Set(activePointsInterval)
-        
-        let activatedPoints = currSet.subtracting(prevSet)
-        
-        return Array(activatedPoints)
-    }
-    
-    // Animations
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: -  Animations
     private func startAnimations(withStaggerValue stagger: Double = 0) {
         var pointsToAnimate = 0 ..< 0
         
@@ -893,7 +929,9 @@
         }
     }
     
-    // Labels
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: -  Labels
     // TODO in 4.1: refactor all label adding & positioning code.
     
     // Update any labels for any new points that have been activated and deactivated.
@@ -997,7 +1035,8 @@
     /* Drawing Delegate functions are called by the children ScrollableGraphViewDrawingLayers to recieve updated info about how to draw
 
      */
-    
+
+    // calculatePosition(...) takes an index and value and returns a CGPoint for the co-ordinates in the view, taking into account the margins, range, and user options.
     internal func calculatePosition(atIndex index: Int, value: Double) -> CGPoint {
         
         // Set range defaults based on settings:
@@ -1029,11 +1068,13 @@
         
         return CGPoint(x: x, y: y)
     }
-    
+
+    //intervalForActivePoints() returns the CountableRange<Int> that represent the indicies of the currently activePoints in the range of all points.
     internal func intervalForActivePoints() -> CountableRange<Int> {
         return activePointsInterval
     }
-    
+
+    // rangeForActivePoints() returns the (minimum, maximum) y-axis values for the active points.
     internal func rangeForActivePoints() -> (min: Double, max: Double) {
         return range
     }
@@ -1041,16 +1082,25 @@
     internal func paddingForPoints() -> (leftmostPointPadding: CGFloat, rightmostPointPadding: CGFloat) {
         return (leftmostPointPadding: leftmostPointPadding, rightmostPointPadding: rightmostPointPadding)
     }
-    
+
+    // currentViewport() returns the CGRect representing the current viewport
     internal func currentViewport() -> CGRect {
         return CGRect(x: 0, y: 0, width: viewportWidth, height: viewportHeight)
     }
     
-    // Update any paths with the new path based on visible data points.
+    // updatePaths() updates any paths with the new path based on visible data points.
+    // updatePaths() finds all ScrollableGraphViewDrawingLayer sublayers of the drawingView, and updates their zeroYPosition then calls updatPath() on them:
+    /*// Called by:
+     - self.activePointsDidChange()
+     - self.reload()
+     - self.viewPortDidChange()
+     - each Plot object during animationUpdate()
+    */
     internal func updatePaths() {
         
         zeroYPosition = calculatePosition(atIndex: 0, value: self.range.min).y
-        
+
+        // for each ScrollableGraphViewDrawingLayer that is a sublayer of the drawingView:
         if let drawingLayers = drawingView.layer.sublayers {
             for layer in drawingLayers {
                 if let layer = layer as? ScrollableGraphViewDrawingLayer {
@@ -1058,6 +1108,7 @@
                     layer.zeroYPosition = zeroYPosition
                     // Need to make sure this is set in createLinePath
                     assert (layer.zeroYPosition > 0);
+                    // Calls updatePath() on the ScrollableGraphViewDrawingLayer
                     layer.updatePath()
                 }
             }

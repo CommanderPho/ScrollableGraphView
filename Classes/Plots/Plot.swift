@@ -37,6 +37,7 @@ open class Plot {
     // #######################
     
     private var currentAnimations = [GraphPointAnimation]()
+    // Plot holds a displayLink object to synchronize with frame rate
     private var displayLink: CADisplayLink!
     private var previousTimestamp: CFTimeInterval = 0
     private var currentTimestamp: CFTimeInterval = 0
@@ -189,6 +190,7 @@ open class Plot {
     }
     
     // Same as a above, but can take an array with the indicies of the activated points rather than a range.
+    // Called by main owning ScrollableGraphView during its activePointsDidChange()
     internal func setPlotPointDataValues(forNewlyActivatedPoints activatedPoints: [Int], withData data: [PlotPointData]) {
         
         var index = 0
@@ -233,7 +235,8 @@ open class Plot {
             dataIndex += 1
         }
     }
-    
+
+    // Sets up the displayLink (CADisplayLink) object
     internal func setup() {
         displayLink = CADisplayLink(target: self, selector: #selector(animationUpdate))
         displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)

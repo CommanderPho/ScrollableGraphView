@@ -80,7 +80,10 @@ open class LinePlot : Plot {
     
     /// If fillType is set to .Gradient, then this defines whether the gradient is rendered as a linear gradient or radial gradient.
     open var fillGradientType = ScrollableGraphViewGradientType.linear
-    
+
+    open var fillGradientOrientation: ScrollableGraphViewLinearGradientOrientation = ScrollableGraphViewLinearGradientOrientation.TopToBottom
+
+
     // Private State
     // #############
     
@@ -117,7 +120,7 @@ open class LinePlot : Plot {
             
         case .gradient:
             if(shouldFill) {
-                gradientLayer = GradientDrawingLayer(frame: viewport, startColor: fillGradientStartColor, endColor: fillGradientEndColor, gradientType: fillGradientType, lineDrawingLayer: lineLayer!)
+                gradientLayer = GradientDrawingLayer(frame: viewport, startColor: fillGradientStartColor, endColor: fillGradientEndColor, gradientType: fillGradientType, gradientOrientation: self.fillGradientOrientation, lineDrawingLayer: lineLayer!, shouldUseComplexGradientLine: self.shouldDrawComplex)
                 gradientLayer?.name = "\(self.identifier).gradientFillLayer"
             }
         }
@@ -141,4 +144,11 @@ open class LinePlot : Plot {
 @objc public enum ScrollableGraphViewGradientType : Int {
     case linear
     case radial
+}
+
+@objc public enum ScrollableGraphViewLinearGradientOrientation : Int {
+    case TopToBottom // Default: maps (startPoint = top, endPoint = bottom)
+    case BottomToTop // maps (startPoint = bottom, endPoint = top)
+    case RightToLeft // maps (startPoint = right, endPoint = left)
+    case LeftToRight // maps (startPoint = left, endPoint = right)
 }

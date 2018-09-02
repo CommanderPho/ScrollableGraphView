@@ -53,23 +53,24 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         
         currentLinePath.removeAllPoints()
         
-        let pathSegmentAdder = lineStyle == .straight ? addStraightLineSegment : addCurvedLineSegment
+        let pathSegmentAdder = (lineStyle == .straight) ? addStraightLineSegment : addCurvedLineSegment
         
-        let activePointsInterval = delegate.intervalForActivePoints()
+        let activePointsInterval: CountableRange<Int> = delegate.intervalForActivePoints()
         
-        let pointPadding = delegate.paddingForPoints()
+        let pointPadding: (leftmostPointPadding: CGFloat, rightmostPointPadding: CGFloat) = delegate.paddingForPoints()
         
         let min = delegate.rangeForActivePoints().min
         zeroYPosition = delegate.calculatePosition(atIndex: 0, value: min).y
         
-        let viewport = delegate.currentViewport()
+        let viewport: CGRect = delegate.currentViewport()
         let viewportWidth = viewport.width
         let viewportHeight = viewport.height
-        
+
+        let firstDataPoint: GraphPoint
         // Connect the line to the starting edge if we are filling it.
         if(shouldFill) {
             // Add a line from the base of the graph to the first data point.
-            let firstDataPoint = owner.graphPoint(forIndex: activePointsInterval.lowerBound)
+             firstDataPoint = owner.graphPoint(forIndex: activePointsInterval.lowerBound)
             
             let viewportLeftZero = CGPoint(x: firstDataPoint.location.x - (pointPadding.leftmostPointPadding), y: zeroYPosition)
             let leftFarEdgeTop = CGPoint(x: firstDataPoint.location.x - (pointPadding.leftmostPointPadding + viewportWidth), y: zeroYPosition)
@@ -81,7 +82,7 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
             pathSegmentAdder(viewportLeftZero, CGPoint(x: firstDataPoint.location.x, y: firstDataPoint.location.y), currentLinePath)
         }
         else {
-            let firstDataPoint = owner.graphPoint(forIndex: activePointsInterval.lowerBound)
+            firstDataPoint = owner.graphPoint(forIndex: activePointsInterval.lowerBound)
             currentLinePath.move(to: firstDataPoint.location)
         }
         
@@ -91,13 +92,14 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
             let startPoint = owner.graphPoint(forIndex: i)
             let endPoint = owner.graphPoint(forIndex: i+1)
 
+
+            let areBothPointsInvisible: Bool = !(startPoint.isVisible || endPoint.isVisible)
             // Skip the invisible points, just move to the next one
-            if (!(startPoint.isVisible || endPoint.isVisible)) {
+            if (areBothPointsInvisible) {
                 currentLinePath.move(to: endPoint.location)
                 continue
             }
             pathSegmentAdder(startPoint.location, endPoint.location, currentLinePath)
-
         }
         
         // Connect the line to the ending edge if we are filling it.
