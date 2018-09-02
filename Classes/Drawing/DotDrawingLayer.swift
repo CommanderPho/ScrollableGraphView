@@ -1,15 +1,19 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
     
-    private var dataPointPath = UIBezierPath()
+    private var dataPointPath = ScrollableGraphViewNSUI.NSUIBezierPath()
     private var dataPointSize: CGFloat = 5
     private var dataPointType: ScrollableGraphViewDataPointType = .circle
     
-    private var customDataPointPath: ((_ centre: CGPoint, _ isVisible: Bool , _ colorOverride: UIColor?) -> UIBezierPath)?
+    private var customDataPointPath: ((_ centre: CGPoint, _ isVisible: Bool , _ colorOverride: ScrollableGraphViewNSUI.NSUIColor?) -> ScrollableGraphViewNSUI.NSUIBezierPath)?
     
-    init(frame: CGRect, fillColor: UIColor, dataPointType: ScrollableGraphViewDataPointType, dataPointSize: CGFloat, customDataPointPath: ((_ centre: CGPoint, _ isVisible: Bool , _ colorOverride: UIColor?) -> UIBezierPath)? = nil) {
+    init(frame: CGRect, fillColor: ScrollableGraphViewNSUI.NSUIColor, dataPointType: ScrollableGraphViewDataPointType, dataPointSize: CGFloat, customDataPointPath: ((_ centre: CGPoint, _ isVisible: Bool , _ colorOverride: ScrollableGraphViewNSUI.NSUIColor?) -> ScrollableGraphViewNSUI.NSUIBezierPath)? = nil) {
         
         self.dataPointType = dataPointType
         self.dataPointSize = dataPointSize
@@ -24,7 +28,7 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func createDataPointPath() -> UIBezierPath {
+    private func createDataPointPath() -> ScrollableGraphViewNSUI.NSUIBezierPath {
         
         dataPointPath.removeAllPoints()
         
@@ -39,14 +43,14 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
             
             var location = CGPoint.zero
             var isVisible: Bool = true
-            var colorOveride: UIColor? = nil
+            var colorOveride: ScrollableGraphViewNSUI.NSUIColor? = nil
 
             if let point = owner?.graphPoint(forIndex: i) {
                 location = point.location
                 isVisible = point.isVisible
                 colorOveride = point.colorOverride
             }
-            let pointPath: UIBezierPath
+            let pointPath: ScrollableGraphViewNSUI.NSUIBezierPath
             if (isVisible) {
                 pointPath = pointPathCreator(location, isVisible, colorOveride)
                 dataPointPath.append(pointPath)
@@ -57,15 +61,15 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
         return dataPointPath
     }
     
-    private func createCircleDataPoint(centre: CGPoint, isVisible: Bool, colorOverride: UIColor?) -> UIBezierPath {
-        if(!isVisible) { return UIBezierPath() }
-        return UIBezierPath(arcCenter: centre, radius: dataPointSize, startAngle: 0, endAngle: CGFloat(2.0 * Double.pi), clockwise: true)
+    private func createCircleDataPoint(centre: CGPoint, isVisible: Bool, colorOverride: ScrollableGraphViewNSUI.NSUIColor?) -> ScrollableGraphViewNSUI.NSUIBezierPath {
+        if(!isVisible) { return ScrollableGraphViewNSUI.NSUIBezierPath() }
+        return ScrollableGraphViewNSUI.NSUIBezierPath(arcCenter: centre, radius: dataPointSize, startAngle: 0, endAngle: CGFloat(2.0 * Double.pi), clockwise: true)
     }
     
-    private func createSquareDataPoint(centre: CGPoint, isVisible: Bool, colorOverride: UIColor?) -> UIBezierPath {
-        if(!isVisible) { return UIBezierPath() }
+    private func createSquareDataPoint(centre: CGPoint, isVisible: Bool, colorOverride: ScrollableGraphViewNSUI.NSUIColor?) -> ScrollableGraphViewNSUI.NSUIBezierPath {
+        if(!isVisible) { return ScrollableGraphViewNSUI.NSUIBezierPath() }
 
-        let squarePath = UIBezierPath()
+        let squarePath = ScrollableGraphViewNSUI.NSUIBezierPath()
         
         squarePath.move(to: centre)
         
@@ -83,7 +87,7 @@ internal class DotDrawingLayer: ScrollableGraphViewDrawingLayer {
         return squarePath
     }
     
-    private func getPointPathCreator() -> (_ centre: CGPoint, _ isVisible: Bool, _ colorOverride: UIColor?) -> UIBezierPath {
+    private func getPointPathCreator() -> (_ centre: CGPoint, _ isVisible: Bool, _ colorOverride: ScrollableGraphViewNSUI.NSUIColor?) -> ScrollableGraphViewNSUI.NSUIBezierPath {
         switch(self.dataPointType) {
         case .circle:
             return createCircleDataPoint

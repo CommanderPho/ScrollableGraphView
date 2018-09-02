@@ -22,5 +22,5 @@ internal struct PlotPointData {
             self._isVisible = newValue
         }
     }
-    var colorOverride: UIColor? = nil
+    var colorOverride: ScrollableGraphViewNSUI.NSUIColor? = nil
 }

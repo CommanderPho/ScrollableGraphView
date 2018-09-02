@@ -57,12 +57,12 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
         return true
     }
 
-    public func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor? {
+    public func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor? {
         return nil
     }
 
 
-    public func labelColor(atIndex pointIndex: Int) -> UIColor? {
+    public func labelColor(atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor? {
         return nil
     }
 }

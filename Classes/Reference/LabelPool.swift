@@ -1,9 +1,13 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class LabelPool {
     
-    var labels = [UILabel]()
+    var labels = [ScrollableGraphViewNSUI.NSUILabel]()
     var relations = [Int : Int]()
     var unused = [Int]()
     
@@ -16,8 +20,8 @@ internal class LabelPool {
     }
     
     @discardableResult
-    func activateLabel(forPointIndex pointIndex: Int) -> UILabel {
-        var label: UILabel
+    func activateLabel(forPointIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUILabel {
+        var label: ScrollableGraphViewNSUI.NSUILabel
         
         if(unused.count >= 1) {
             let unusedLabelIndex = unused.first!
@@ -27,7 +31,7 @@ internal class LabelPool {
             relations[pointIndex] = unusedLabelIndex
         }
         else {
-            label = UILabel()
+            label = ScrollableGraphViewNSUI.NSUILabel()
             labels.append(label)
             let newLabelIndex = labels.index(of: label)!
             relations[pointIndex] = newLabelIndex
@@ -36,10 +40,10 @@ internal class LabelPool {
         return label
     }
     
-    var activeLabels: [UILabel] {
+    var activeLabels: [ScrollableGraphViewNSUI.NSUILabel] {
         get {
             
-            var currentlyActive = [UILabel]()
+            var currentlyActive = [ScrollableGraphViewNSUI.NSUILabel]()
             let numberOfLabels = labels.count
             
             for i in 0 ..< numberOfLabels {

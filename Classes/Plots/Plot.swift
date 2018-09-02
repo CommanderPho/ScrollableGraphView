@@ -1,5 +1,9 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 open class Plot {
     

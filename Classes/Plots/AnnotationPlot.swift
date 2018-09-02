@@ -6,7 +6,11 @@
 //  Copyright © 2018 SGV. All rights reserved.
 //
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 open class AnnotationPlot : Plot {
 
@@ -16,11 +20,11 @@ open class AnnotationPlot : Plot {
     /// The width of an individual bar on the graph.
     open var barWidth: CGFloat = 25;
     /// The actual colour of the bar.
-    open var barColor: UIColor = UIColor.gray
+    open var barColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.gray
     /// The width of the outline of the bar
     open var barLineWidth: CGFloat = 1
     /// The colour of the bar outline
-    open var barLineColor: UIColor = UIColor.darkGray
+    open var barLineColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.darkGray
     /// Whether the bars should be drawn with rounded corners
     open var shouldRoundBarCorners: Bool = false
 

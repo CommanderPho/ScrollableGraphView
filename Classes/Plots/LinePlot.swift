@@ -1,5 +1,9 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 open class LinePlot : Plot {
     
@@ -9,8 +13,8 @@ open class LinePlot : Plot {
     /// Specifies how thick the graph of the line is. In points.
     open var lineWidth: CGFloat = 2
     
-    /// The color of the graph line. UIColor.
-    open var lineColor: UIColor = UIColor.black
+    /// The color of the graph line. ScrollableGraphViewNSUI.NSUIColor.
+    open var lineColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.black
     
     /// Whether the line is straight or curved.
     open var lineStyle_: Int {
@@ -57,13 +61,13 @@ open class LinePlot : Plot {
     open var fillType = ScrollableGraphViewFillType.solid
     
     /// If fillType is set to .Solid then this colour will be used to fill the graph.
-    open var fillColor: UIColor = UIColor.black
+    open var fillColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.black
     
     /// If fillType is set to .Gradient then this will be the starting colour for the gradient.
-    open var fillGradientStartColor: UIColor = UIColor.white
+    open var fillGradientStartColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.white
     
     /// If fillType is set to .Gradient, then this will be the ending colour for the gradient.
-    open var fillGradientEndColor: UIColor = UIColor.black
+    open var fillGradientEndColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.black
     
     open var fillGradientType_: Int {
         get { return fillGradientType.rawValue }

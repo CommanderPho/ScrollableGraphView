@@ -6,18 +6,22 @@
 //  Copyright © 2018 SGV. All rights reserved.
 //
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 // MARK: Drawing the annotations
 internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
 
-    private var annotationPath = UIBezierPath()
+    private var annotationPath = ScrollableGraphViewNSUI.NSUIBezierPath()
     private var annotationWidth: CGFloat = 4
     private var shouldRoundCorners = false
     private var shouldDrawDayBoxes = false
 
 
-    init(frame: CGRect, barWidth: CGFloat, barColor: UIColor, barLineWidth: CGFloat, barLineColor: UIColor, shouldRoundCorners: Bool, shouldDrawDayBoxes: Bool) {
+    init(frame: CGRect, barWidth: CGFloat, barColor: ScrollableGraphViewNSUI.NSUIColor, barLineWidth: CGFloat, barLineColor: ScrollableGraphViewNSUI.NSUIColor, shouldRoundCorners: Bool, shouldDrawDayBoxes: Bool) {
 
         self.annotationWidth = barWidth
         self.shouldRoundCorners = shouldRoundCorners
@@ -43,7 +47,7 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
 
 
 
-    private func createBarPath(centre: CGPoint) -> UIBezierPath {
+    private func createBarPath(centre: CGPoint) -> ScrollableGraphViewNSUI.NSUIBezierPath {
 
         let annotationWidthOffset: CGFloat = self.annotationWidth / 2
 
@@ -51,18 +55,18 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
         let size = CGSize(width: annotationWidth, height: zeroYPosition - centre.y)
         let rect = CGRect(origin: origin, size: size)
 
-        let annotationPath: UIBezierPath = {
+        let annotationPath: ScrollableGraphViewNSUI.NSUIBezierPath = {
             if shouldRoundCorners {
-                return UIBezierPath(roundedRect: rect, cornerRadius: annotationWidthOffset)
+                return ScrollableGraphViewNSUI.NSUIBezierPath(roundedRect: rect, cornerRadius: annotationWidthOffset)
             } else {
-                return UIBezierPath(rect: rect)
+                return ScrollableGraphViewNSUI.NSUIBezierPath(rect: rect)
             }
         }()
 
         return annotationPath
     }
 
-    private func createPath () -> UIBezierPath {
+    private func createPath () -> ScrollableGraphViewNSUI.NSUIBezierPath {
 
         annotationPath.removeAllPoints()
 
@@ -75,14 +79,14 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
 
             var location = CGPoint.zero
             var isVisible: Bool = false
-            var colorOveride: UIColor? = nil
+            var colorOveride: ScrollableGraphViewNSUI.NSUIColor? = nil
 
             if let point = owner?.graphPoint(forIndex: i) {
                 location = point.location
                 isVisible = point.isVisible
                 colorOveride = point.colorOverride
             }
-            let pointPath: UIBezierPath
+            let pointPath: ScrollableGraphViewNSUI.NSUIBezierPath
             if (isVisible) {
                 pointPath = createBarPath(centre: location)
                 annotationPath.append(pointPath)

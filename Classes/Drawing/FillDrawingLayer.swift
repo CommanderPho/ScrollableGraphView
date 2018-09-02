@@ -1,5 +1,9 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class FillDrawingLayer : ScrollableGraphViewDrawingLayer {
     
@@ -7,7 +11,7 @@ internal class FillDrawingLayer : ScrollableGraphViewDrawingLayer {
     // to know what the line looks like.
     private var lineDrawingLayer: LineDrawingLayer
     
-    init(frame: CGRect, fillColor: UIColor, lineDrawingLayer: LineDrawingLayer) {
+    init(frame: CGRect, fillColor: ScrollableGraphViewNSUI.NSUIColor, lineDrawingLayer: LineDrawingLayer) {
         
         self.lineDrawingLayer = lineDrawingLayer
         super.init(viewportWidth: frame.size.width, viewportHeight: frame.size.height)

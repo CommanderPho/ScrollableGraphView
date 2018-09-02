@@ -1,15 +1,19 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
     
-    private var currentLinePath = UIBezierPath()
+    private var currentLinePath = ScrollableGraphViewNSUI.NSUIBezierPath()
     
     private var lineStyle: ScrollableGraphViewLineStyle
     private var shouldFill: Bool
     private var lineCurviness: CGFloat
     
-    init(frame: CGRect, lineWidth: CGFloat, lineColor: UIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat, lineDashPattern: [NSNumber]? = nil) {
+    init(frame: CGRect, lineWidth: CGFloat, lineColor: ScrollableGraphViewNSUI.NSUIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat, lineDashPattern: [NSNumber]? = nil) {
         
         self.lineStyle = lineStyle
         self.shouldFill = shouldFill
@@ -25,7 +29,7 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         self.lineCap = lineCap
         
         // Setup
-        self.fillColor = UIColor.clear.cgColor // This is handled by the fill drawing layer.
+        self.fillColor = ScrollableGraphViewNSUI.NSUIColor.clear.cgColor // This is handled by the fill drawing layer.
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -36,10 +40,10 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
 //        fatalError("init(layer:) has not been implemented")
 //    }
 
-    internal func createLinePath() -> UIBezierPath {
+    internal func createLinePath() -> ScrollableGraphViewNSUI.NSUIBezierPath {
         
         guard let owner = owner else {
-            return UIBezierPath()
+            return ScrollableGraphViewNSUI.NSUIBezierPath()
         }
         
         // Can't really do anything without the delegate.
@@ -113,11 +117,11 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
         return currentLinePath
     }
     
-    private func addStraightLineSegment(startPoint: CGPoint, endPoint: CGPoint, inPath path: UIBezierPath) {
+    private func addStraightLineSegment(startPoint: CGPoint, endPoint: CGPoint, inPath path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         path.addLine(to: endPoint)
     }
     
-    private func addCurvedLineSegment(startPoint: CGPoint, endPoint: CGPoint, inPath path: UIBezierPath) {
+    private func addCurvedLineSegment(startPoint: CGPoint, endPoint: CGPoint, inPath path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         // calculate control points
         let difference = endPoint.x - startPoint.x
         

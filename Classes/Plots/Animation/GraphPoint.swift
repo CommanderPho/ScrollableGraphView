@@ -1,11 +1,15 @@
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class GraphPoint {
     
     var location = CGPoint(x: 0, y: 0)
     var currentlyAnimatingToPosition = false
     var isVisible: Bool = true
-    var colorOverride: UIColor? = nil
+    var colorOverride: ScrollableGraphViewNSUI.NSUIColor? = nil
     
     var x: CGFloat {
         get {

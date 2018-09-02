@@ -7,7 +7,11 @@
 //
 
 import Foundation
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 
 public extension ScrollableGraphView {

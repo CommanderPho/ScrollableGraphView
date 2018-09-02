@@ -1,4 +1,8 @@
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 // MARK: - ScrollableGraphView
 @IBDesignable
@@ -12,7 +16,7 @@ import UIKit
     // ###########
     
     /// The background colour for the entire graph view, not just the plotted graph.
-    @IBInspectable open var backgroundFillColor: UIColor = UIColor.white
+    @IBInspectable open var backgroundFillColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.white
     
     // Spacing
     // #######
@@ -85,14 +89,14 @@ import UIKit
     internal var zeroYPosition: CGFloat = 0
     
     // Graph Drawing
-    private var drawingView = UIView()
+    private var drawingView = ScrollableGraphViewNSUI.NSUIView()
     private var plots: [Plot] = [Plot]()
     
     // Reference Lines
     private var referenceLineView: ReferenceLineDrawingView?
     
     // Labels
-    private var labelsView = UIView()
+    private var labelsView = ScrollableGraphViewNSUI.NSUIView()
     private var labelPool = LabelPool()
     
     // Data Source
@@ -110,13 +114,13 @@ import UIKit
         return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
     }
 
-    public func getDrawingView() -> UIView {
+    public func getDrawingView() -> ScrollableGraphViewNSUI.NSUIView {
         return self.drawingView
     }
-    public func getReferenceLinesView() -> UIView? {
+    public func getReferenceLinesView() -> ScrollableGraphViewNSUI.NSUIView? {
         return self.referenceLineView
     }
-    public func getLabelsView() -> UIView {
+    public func getLabelsView() -> ScrollableGraphViewNSUI.NSUIView {
         return self.labelsView
     }
 
@@ -193,14 +197,14 @@ import UIKit
         // Graph Line
         self.zeroYPosition = 0
         // Graph Drawing
-        self.drawingView = UIView()
+        self.drawingView = ScrollableGraphViewNSUI.NSUIView()
         self.plots = [Plot]()
 
         // Reference Lines
         self.referenceLineView = nil
 
         // Labels
-        self.labelsView = UIView()
+        self.labelsView = ScrollableGraphViewNSUI.NSUIView()
         self.labelPool = LabelPool()
 
         // Data Source
@@ -227,7 +231,7 @@ import UIKit
         // Add the subviews we will use to draw everything.
         
         // Add the drawing view in which we draw all the plots.
-        self.drawingView = UIView(frame: viewport)
+        self.drawingView = ScrollableGraphViewNSUI.NSUIView(frame: viewport)
         self.drawingView.backgroundColor = backgroundFillColor
         self.drawingView.accessibilityIdentifier = "drawingView"
         self.addSubview(drawingView)

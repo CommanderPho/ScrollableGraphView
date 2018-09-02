@@ -1,5 +1,9 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 // Delegate definition that provides the data required by the drawing layers.
 // This is only conformed to by the main ScrollableGraphView class.

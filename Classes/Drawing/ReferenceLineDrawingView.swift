@@ -1,7 +1,11 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
-internal class ReferenceLineDrawingView : UIView {
+internal class ReferenceLineDrawingView : ScrollableGraphViewNSUI.NSUIView {
     
     var settings: ReferenceLines = ReferenceLines()
     
@@ -34,11 +38,11 @@ internal class ReferenceLineDrawingView : UIView {
     }
     
     // Layers
-    private var labels = [UILabel]()
+    private var labels = [ScrollableGraphViewNSUI.NSUILabel]()
     private let referenceLineLayer = CAShapeLayer()
-    private let referenceLinePath = UIBezierPath()
+    private let referenceLinePath = ScrollableGraphViewNSUI.NSUIBezierPath()
     
-    init(frame: CGRect, topMargin: CGFloat, bottomMargin: CGFloat, referenceLineColor: UIColor, referenceLineThickness: CGFloat, referenceLineSettings: ReferenceLines) {
+    init(frame: CGRect, topMargin: CGFloat, bottomMargin: CGFloat, referenceLineColor: ScrollableGraphViewNSUI.NSUIColor, referenceLineThickness: CGFloat, referenceLineSettings: ReferenceLines) {
         super.init(frame: frame)
         
         self.topMargin = topMargin
@@ -58,14 +62,14 @@ internal class ReferenceLineDrawingView : UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func createLabel(at position: CGPoint, withText text: String) -> UILabel {
+    private func createLabel(at position: CGPoint, withText text: String) -> ScrollableGraphViewNSUI.NSUILabel {
         let frame = CGRect(x: position.x, y: position.y, width: 0, height: 0)
-        let label = UILabel(frame: frame)
+        let label = ScrollableGraphViewNSUI.NSUILabel(frame: frame)
         
         return label
     }
     
-    private func createReferenceLinesPath() -> UIBezierPath {
+    private func createReferenceLinesPath() -> ScrollableGraphViewNSUI.NSUIBezierPath {
         
         referenceLinePath.removeAllPoints()
         for label in labels {
@@ -110,7 +114,7 @@ internal class ReferenceLineDrawingView : UIView {
         return numberFormatter
     }
     
-    private func createReferenceLines(in rect: CGRect, atRelativePositions relativePositions: [Double], forPath path: UIBezierPath) {
+    private func createReferenceLines(in rect: CGRect, atRelativePositions relativePositions: [Double], forPath path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         
         let height = rect.size.height
         var relativePositions = relativePositions
@@ -133,7 +137,7 @@ internal class ReferenceLineDrawingView : UIView {
         }
     }
     
-    private func createReferenceLines(in rect: CGRect, atAbsolutePositions absolutePositions: [Double], forPath path: UIBezierPath) {
+    private func createReferenceLines(in rect: CGRect, atAbsolutePositions absolutePositions: [Double], forPath path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         
         for absolutePosition in absolutePositions {
             
@@ -149,7 +153,7 @@ internal class ReferenceLineDrawingView : UIView {
         }
     }
     
-    private func createReferenceLineFrom(from lineStart: CGPoint, to lineEnd: CGPoint, in path: UIBezierPath) {
+    private func createReferenceLineFrom(from lineStart: CGPoint, to lineEnd: CGPoint, in path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         if(self.settings.shouldAddLabelsToIntermediateReferenceLines) {
             
             let value = calculateYAxisValue(for: lineStart)
@@ -167,7 +171,7 @@ internal class ReferenceLineDrawingView : UIView {
         }
     }
     
-    private func addLine(withTag tag: String, from: CGPoint, to: CGPoint, in path: UIBezierPath) {
+    private func addLine(withTag tag: String, from: CGPoint, to: CGPoint, in path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         
         let boundingSize = self.boundingSize(forText: tag)
         let leftLabel = createLabel(withText: tag)
@@ -216,7 +220,7 @@ internal class ReferenceLineDrawingView : UIView {
         addLine(from: from, to: to, withGaps: gaps, in: path)
     }
     
-    private func addLine(from: CGPoint, to: CGPoint, withGaps gaps: [(start: CGFloat, end: CGFloat)], in path: UIBezierPath) {
+    private func addLine(from: CGPoint, to: CGPoint, withGaps gaps: [(start: CGFloat, end: CGFloat)], in path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         
         // If there are no gaps, just add a single line.
         if(gaps.count <= 0) {
@@ -260,7 +264,7 @@ internal class ReferenceLineDrawingView : UIView {
         }
     }
     
-    private func addLine(from: CGPoint, to: CGPoint, in path: UIBezierPath) {
+    private func addLine(from: CGPoint, to: CGPoint, in path: ScrollableGraphViewNSUI.NSUIBezierPath) {
         path.move(to: from)
         path.addLine(to: to)
     }
@@ -303,8 +307,8 @@ internal class ReferenceLineDrawingView : UIView {
         return y
     }
     
-    private func createLabel(withText text: String) -> UILabel {
-        let label = UILabel()
+    private func createLabel(withText text: String) -> ScrollableGraphViewNSUI.NSUILabel {
+        let label = ScrollableGraphViewNSUI.NSUILabel()
         
         label.text = text
         label.textColor = self.settings.referenceLineLabelColor

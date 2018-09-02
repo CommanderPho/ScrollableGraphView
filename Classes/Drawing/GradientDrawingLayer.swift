@@ -1,10 +1,14 @@
 
-import UIKit
+#if os(OSX)
+    import Cocoa
+#else
+    import UIKit
+#endif
 
 internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
     
-    private var startColor: UIColor
-    private var endColor: UIColor
+    private var startColor: ScrollableGraphViewNSUI.NSUIColor
+    private var endColor: ScrollableGraphViewNSUI.NSUIColor
     private var gradientType: ScrollableGraphViewGradientType
     
     // Gradient fills are only used with lineplots and we need 
@@ -21,7 +25,7 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         return mask
     })()
     
-    init(frame: CGRect, startColor: UIColor, endColor: UIColor, gradientType: ScrollableGraphViewGradientType, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer) {
+    init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer) {
         self.startColor = startColor
         self.endColor = endColor
         self.gradientType = gradientType

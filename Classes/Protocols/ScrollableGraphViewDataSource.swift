@@ -1,5 +1,10 @@
-
+// Frameworks
+import QuartzCore
+#if os(OSX)
+import Cocoa
+#else
 import UIKit
+#endif
 
 public protocol ScrollableGraphViewDataSource {
     
@@ -9,9 +14,9 @@ public protocol ScrollableGraphViewDataSource {
 
     // Optional Methods:
     func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool
-    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor?
+    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor?
 
-    func labelColor(atIndex pointIndex: Int) -> UIColor?
+    func labelColor(atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor?
 }
 
 
@@ -25,12 +30,12 @@ public extension ScrollableGraphViewDataSource {
         return true
     }
 
-    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor? {
+    func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor? {
         return nil
     }
 
 
-    func labelColor(atIndex pointIndex: Int) -> UIColor? {
+    func labelColor(atIndex pointIndex: Int) -> ScrollableGraphViewNSUI.NSUIColor? {
         return nil
     }
 }
