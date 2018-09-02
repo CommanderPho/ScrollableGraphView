@@ -26,6 +26,9 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         return mask
     })()
 
+    private var shouldDrawComplex: Bool = false
+    private var complexGradient: ActivePointsGradient = ActivePointsGradient()
+
     init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, gradientOrientation: ScrollableGraphViewLinearGradientOrientation, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer) {
         self.startColor = startColor
         self.endColor = endColor
@@ -40,6 +43,14 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         addMaskLayer()
         self.setNeedsDisplay()
     }
+
+    convenience init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, gradientOrientation: ScrollableGraphViewLinearGradientOrientation, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer, shouldUseComplexGradientLine: Bool) {
+        self.init(frame: frame, startColor: startColor, endColor: endColor, gradientType: gradientType, gradientOrientation: gradientOrientation, lineDrawingLayer: lineDrawingLayer)
+        self.shouldDrawComplex = shouldUseComplexGradientLine
+        if (self.shouldDrawComplex) {
+            self.lineDrawingLayer.shouldDrawComplex = true
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -51,13 +62,26 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
     
     override func updatePath() {
         gradientMask.path = lineDrawingLayer.createLinePath().cgPath
+        if (self.shouldDrawComplex) {
+            self.complexGradient = lineDrawingLayer.complexGradient
+        }
     }
     
     override func draw(in ctx: CGContext) {
         
-        let colors = [startColor.cgColor, endColor.cgColor]
+        let colors: [CGColor]
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let locations: [CGFloat] = [0.0, 1.0]
+        let locations: [CGFloat]
+
+        if (self.shouldDrawComplex) {
+            colors = self.complexGradient.colors
+            locations = self.complexGradient.locations
+        }
+        else {
+            colors = [startColor.cgColor, endColor.cgColor]
+            locations = [0.0, 1.0]
+        }
+
         let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: locations)
         
         let verticalDisplacement = ((viewportWidth / viewportHeight) / 2.5) * self.bounds.height

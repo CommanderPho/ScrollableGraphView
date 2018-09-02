@@ -90,6 +90,10 @@ open class LinePlot : Plot {
     private var lineLayer: LineDrawingLayer?
     private var fillLayer: FillDrawingLayer?
     private var gradientLayer: GradientDrawingLayer?
+
+    private var shouldDrawComplex: Bool = false
+    private var complexGradient: ActivePointsGradient = ActivePointsGradient()
+
     
     public init(identifier: String) {
         super.init()

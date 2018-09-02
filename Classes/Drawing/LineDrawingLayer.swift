@@ -12,7 +12,10 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
     private var lineStyle: ScrollableGraphViewLineStyle
     private var shouldFill: Bool
     private var lineCurviness: CGFloat
-    
+
+    internal var shouldDrawComplex: Bool = false
+    internal var complexGradient: ActivePointsGradient = ActivePointsGradient()
+
     init(frame: CGRect, lineWidth: CGFloat, lineColor: ScrollableGraphViewNSUI.NSUIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat, lineDashPattern: [NSNumber]? = nil) {
         
         self.lineStyle = lineStyle
@@ -34,6 +37,11 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    convenience init(frame: CGRect, lineWidth: CGFloat, lineColor: ScrollableGraphViewNSUI.NSUIColor, lineStyle: ScrollableGraphViewLineStyle, lineJoin: String, lineCap: String, shouldFill: Bool, lineCurviness: CGFloat, lineDashPattern: [NSNumber]? = nil, shouldBuildComplexGradient: Bool) {
+        self.init(frame: frame, lineWidth: lineWidth, lineColor: lineColor, lineStyle: lineStyle, lineJoin: lineJoin, lineCap: lineCap, shouldFill: shouldFill, lineCurviness: lineCurviness, lineDashPattern: lineDashPattern)
+        self.shouldDrawComplex = shouldBuildComplexGradient
     }
 
 //    override init(layer: Any) {
@@ -85,6 +93,10 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
             firstDataPoint = owner.graphPoint(forIndex: activePointsInterval.lowerBound)
             currentLinePath.move(to: firstDataPoint.location)
         }
+
+        if (self.shouldDrawComplex) {
+            self.complexGradient = ActivePointsGradient(withSize: activePointsInterval.count)
+        }
         
         // Connect each point on the graph with a segment.
         for i in activePointsInterval.lowerBound ..< activePointsInterval.upperBound - 1 {
@@ -92,8 +104,31 @@ internal class LineDrawingLayer : ScrollableGraphViewDrawingLayer {
             let startPoint = owner.graphPoint(forIndex: i)
             let endPoint = owner.graphPoint(forIndex: i+1)
 
+            // the index over the active point range, with 0 being activePointsInterval.lowerBound
+            let activePointRangeIndex: Int = i - activePointsInterval.lowerBound
 
             let areBothPointsInvisible: Bool = !(startPoint.isVisible || endPoint.isVisible)
+
+            if (self.shouldDrawComplex) {
+                var startPointColor: ScrollableGraphViewNSUI.NSUIColor = .clear
+                if (startPoint.isVisible) {
+                    if let validOverrideColor = startPoint.colorOverride {
+                        startPointColor = validOverrideColor
+                    }
+                    else {
+                        // Otherwise try to get the default color for the owning plot
+                        if let validLinePlotOwner = self.owner as? LinePlot {
+                            startPointColor = validLinePlotOwner.lineColor
+                        }
+                        else {
+                            startPointColor = .white
+                        }
+                    }
+                }
+                // If not visible, the color is clear
+                self.complexGradient.update(index: activePointRangeIndex, color: startPointColor)
+            }
+
             // Skip the invisible points, just move to the next one
             if (areBothPointsInvisible) {
                 currentLinePath.move(to: endPoint.location)

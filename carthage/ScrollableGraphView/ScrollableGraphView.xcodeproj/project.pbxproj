@@ -35,6 +35,7 @@
 		D7B5C43D213C44F300D02309 /* ScreenshotFunctionality.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B5C43C213C44F300D02309 /* ScreenshotFunctionality.swift */; };
 		D7B5C43F213C4B5D00D02309 /* ScrollableGraphViewAnimationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B5C43E213C4B5D00D02309 /* ScrollableGraphViewAnimationType.swift */; };
 		D7B5C442213C4D5500D02309 /* CrossPlatformDefines.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B5C441213C4D5400D02309 /* CrossPlatformDefines.swift */; };
+		D7B5C444213C70DE00D02309 /* ActivePointsGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B5C443213C70DE00D02309 /* ActivePointsGradient.swift */; };
 		D7E923E02030A8BF00072217 /* ScrollableGraphViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E923DF2030A8BF00072217 /* ScrollableGraphViewDelegate.swift */; };
 		D7FC1F2020914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FC1F1F20914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift */; };
 /* End PBXBuildFile section */
@@ -70,6 +71,7 @@
 		D7B5C43C213C44F300D02309 /* ScreenshotFunctionality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotFunctionality.swift; sourceTree = "<group>"; };
 		D7B5C43E213C4B5D00D02309 /* ScrollableGraphViewAnimationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableGraphViewAnimationType.swift; sourceTree = "<group>"; };
 		D7B5C441213C4D5400D02309 /* CrossPlatformDefines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrossPlatformDefines.swift; sourceTree = "<group>"; };
+		D7B5C443213C70DE00D02309 /* ActivePointsGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePointsGradient.swift; sourceTree = "<group>"; };
 		D7E923DF2030A8BF00072217 /* ScrollableGraphViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableGraphViewDelegate.swift; sourceTree = "<group>"; };
 		D7FC1F1F20914644003DA382 /* ScrollableGraphView-ViewportExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollableGraphView-ViewportExtensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -186,6 +188,7 @@
 		D7B5C435213C445600D02309 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				D7B5C443213C70DE00D02309 /* ActivePointsGradient.swift */,
 				D7B5C441213C4D5400D02309 /* CrossPlatformDefines.swift */,
 				D7B5C43C213C44F300D02309 /* ScreenshotFunctionality.swift */,
 				D7B5C43A213C44CC00D02309 /* InterfaceBuilder-ScrollableGraphViewDataSource.swift */,
@@ -283,6 +286,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7B5C444213C70DE00D02309 /* ActivePointsGradient.swift in Sources */,
 				298BFD551F121BB00062F5C8 /* Plot.swift in Sources */,
 				298BFD561F121BB00062F5C8 /* ScrollableGraphViewDataSource.swift in Sources */,
 				298BFD541F121BB00062F5C8 /* LinePlot.swift in Sources */,
