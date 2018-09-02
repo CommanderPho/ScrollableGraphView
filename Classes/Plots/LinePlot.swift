@@ -83,6 +83,7 @@ open class LinePlot : Plot {
 
     open var fillGradientOrientation: ScrollableGraphViewLinearGradientOrientation = ScrollableGraphViewLinearGradientOrientation.TopToBottom
 
+    open var fillGradientComplexity: ScrollableGraphViewGradientComplexity = ScrollableGraphViewGradientComplexity.Simple
 
     // Private State
     // #############
@@ -91,10 +92,6 @@ open class LinePlot : Plot {
     private var fillLayer: FillDrawingLayer?
     private var gradientLayer: GradientDrawingLayer?
 
-    private var shouldDrawComplex: Bool = false
-    private var complexGradient: ActivePointsGradient = ActivePointsGradient()
-
-    
     public init(identifier: String) {
         super.init()
         self.identifier = identifier
@@ -124,7 +121,7 @@ open class LinePlot : Plot {
             
         case .gradient:
             if(shouldFill) {
-                gradientLayer = GradientDrawingLayer(frame: viewport, startColor: fillGradientStartColor, endColor: fillGradientEndColor, gradientType: fillGradientType, gradientOrientation: self.fillGradientOrientation, lineDrawingLayer: lineLayer!, shouldUseComplexGradientLine: self.shouldDrawComplex)
+                gradientLayer = GradientDrawingLayer(frame: viewport, startColor: fillGradientStartColor, endColor: fillGradientEndColor, gradientType: fillGradientType, gradientOrientation: self.fillGradientOrientation, gradientColorComplexity: self.fillGradientComplexity, lineDrawingLayer: lineLayer!)
                 gradientLayer?.name = "\(self.identifier).gradientFillLayer"
             }
         }
@@ -155,4 +152,9 @@ open class LinePlot : Plot {
     case BottomToTop // maps (startPoint = bottom, endPoint = top)
     case RightToLeft // maps (startPoint = right, endPoint = left)
     case LeftToRight // maps (startPoint = left, endPoint = right)
+}
+
+@objc public enum ScrollableGraphViewGradientComplexity : Int {
+    case Simple // Default: Simple two color gradient
+    case DatasourceProvidedColors // Uses the colors provided by the DataSource
 }

@@ -11,7 +11,8 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
     private var endColor: ScrollableGraphViewNSUI.NSUIColor
     private var gradientType: ScrollableGraphViewGradientType
     private var gradientOrientation: ScrollableGraphViewLinearGradientOrientation
-    
+    private var gradientColorComplexity: ScrollableGraphViewGradientComplexity
+
     // Gradient fills are only used with lineplots and we need 
     // to know what the line looks like.
     private var lineDrawingLayer: LineDrawingLayer
@@ -26,16 +27,22 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         return mask
     })()
 
-    private var shouldDrawComplex: Bool = false
     private var complexGradient: ActivePointsGradient = ActivePointsGradient()
 
-    init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, gradientOrientation: ScrollableGraphViewLinearGradientOrientation, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer) {
+    init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, gradientOrientation: ScrollableGraphViewLinearGradientOrientation, gradientColorComplexity: ScrollableGraphViewGradientComplexity, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer) {
         self.startColor = startColor
         self.endColor = endColor
         self.gradientType = gradientType
         //self.lineJoin = lineJoin
         self.gradientOrientation = gradientOrientation
-        
+        self.gradientColorComplexity = gradientColorComplexity
+
+        switch self.gradientColorComplexity {
+        case .Simple:
+            lineDrawingLayer.shouldDrawComplex = false
+        case .DatasourceProvidedColors:
+            lineDrawingLayer.shouldDrawComplex = true
+        }
         self.lineDrawingLayer = lineDrawingLayer
 
         super.init(viewportWidth: frame.size.width, viewportHeight: frame.size.height)
@@ -44,14 +51,6 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         self.setNeedsDisplay()
     }
 
-    convenience init(frame: CGRect, startColor: ScrollableGraphViewNSUI.NSUIColor, endColor: ScrollableGraphViewNSUI.NSUIColor, gradientType: ScrollableGraphViewGradientType, gradientOrientation: ScrollableGraphViewLinearGradientOrientation, lineJoin: String = kCALineJoinRound, lineDrawingLayer: LineDrawingLayer, shouldUseComplexGradientLine: Bool) {
-        self.init(frame: frame, startColor: startColor, endColor: endColor, gradientType: gradientType, gradientOrientation: gradientOrientation, lineDrawingLayer: lineDrawingLayer)
-        self.shouldDrawComplex = shouldUseComplexGradientLine
-        if (self.shouldDrawComplex) {
-            self.lineDrawingLayer.shouldDrawComplex = true
-        }
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -62,7 +61,10 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
     
     override func updatePath() {
         gradientMask.path = lineDrawingLayer.createLinePath().cgPath
-        if (self.shouldDrawComplex) {
+        switch self.gradientColorComplexity {
+        case .Simple:
+            return
+        case .DatasourceProvidedColors:
             self.complexGradient = lineDrawingLayer.complexGradient
         }
     }
@@ -73,19 +75,20 @@ internal class GradientDrawingLayer : ScrollableGraphViewDrawingLayer {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let locations: [CGFloat]
 
-        if (self.shouldDrawComplex) {
-            colors = self.complexGradient.colors
-            locations = self.complexGradient.locations
-        }
-        else {
+        switch self.gradientColorComplexity {
+        case .Simple:
             colors = [startColor.cgColor, endColor.cgColor]
             locations = [0.0, 1.0]
+        case .DatasourceProvidedColors:
+//            colors = self.complexGradient.colors
+//            locations = self.complexGradient.locations
+            colors = Array(self.complexGradient.colors.prefix(8))
+            locations = Array(self.complexGradient.locations.prefix(8))
         }
 
         let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: locations)
         
         let verticalDisplacement = ((viewportWidth / viewportHeight) / 2.5) * self.bounds.height
-
         let horizontalDisplacement = ((viewportHeight / viewportWidth) / 2.5) * self.bounds.width
 
         // Note: horizontalCenterOffset used to be "offset + self.bounds.width / 2"
