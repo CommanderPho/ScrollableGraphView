@@ -5,7 +5,9 @@ open class Plot {
     
     // The id for this plot. Used when determining which data to give it in the dataSource
     open var identifier: String!
-    
+
+    // This refers to the main ScrollableGraphView object that owns this Plot.
+    // graphViewDrawingDelegate is used both directly by a Plot and indirectly by a plot's drawing layers through their owner.graphViewDrawingDelegate.
     var graphViewDrawingDelegate: ScrollableGraphViewDrawingDelegate! = nil
     
     // Animation Settings
@@ -144,12 +146,13 @@ open class Plot {
     internal func startAnimations(forPoints pointsToAnimate: CountableRange<Int>, withData data: [PlotPointData], withStaggerValue stagger: Double) {
         animatePlotPointData(forPoints: pointsToAnimate, withData: data, withDelay: stagger)
     }
-    
+
+
     internal func createPlotPoints(numberOfPoints: Int, range: (min: Double, max: Double)) {
         for i in 0 ..< numberOfPoints {
             
             let value = range.min
-            
+            // The position is determined by the owning graphViewDrawingDelegate
             let position = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: value)
             let point = GraphPoint(position: position)
             graphPoints.append(point)
@@ -172,7 +175,7 @@ open class Plot {
             else { currValue = 0.0 }
             let isVisible = currData.isVisible
             let color = currData.colorOverride
-            
+            // The position is determined by the owning graphViewDrawingDelegate
             let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: currValue)
             graphPoints[i].x = newPosition.x
             graphPoints[i].y = newPosition.y
@@ -195,7 +198,7 @@ open class Plot {
 
             let isVisible = currData.isVisible
             let color = currData.colorOverride
-
+            // The position is determined by the owning graphViewDrawingDelegate
             let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: activatedPointIndex, value: currValue)
             graphPoints[activatedPointIndex].x = newPosition.x
             graphPoints[activatedPointIndex].y = newPosition.y
@@ -217,6 +220,7 @@ open class Plot {
             let currValue: Double
             if let validValue = data[dataIndex].value { currValue = validValue }
             else { currValue = 0.0 }
+            // The position is determined by the owning graphViewDrawingDelegate
             let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: currValue) //TODO: why is this not data[pointIndex]??? I think it's because the only data passed in is the data corresponding to each of the pointsToAnimate
             animate(point: graphPoints[pointIndex], to: newPosition, withDelay: Double(dataIndex) * delay)
             // Update the other parameters instantly (no animation)
@@ -245,22 +249,10 @@ open class Plot {
     }
 }
 
+
 extension Plot: Equatable {
     public static func ==(lhs: Plot, rhs: Plot) -> Bool {
         return (lhs.identifier == rhs.identifier)
     }
 }
-
-@objc public enum ScrollableGraphViewAnimationType : Int {
-    case easeOut
-    case elastic
-    case custom
-}
-
-
-
-
-
-
-
 

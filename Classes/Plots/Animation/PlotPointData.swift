@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 internal struct PlotPointData {
 
     var value: Double? = nil

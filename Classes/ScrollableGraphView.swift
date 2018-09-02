@@ -493,7 +493,8 @@ import UIKit
     
     // MARK: - Public Methods
     // ######################
-    
+
+    // Adds a Plot object to the graph
     public func addPlot(plot: Plot) {
         // If we aren't setup yet, save the plot to be added during setup.
         if(self.isInitialSetup) {
@@ -504,7 +505,8 @@ import UIKit
             self.addPlotToGraph(plot: plot, activePointsInterval: self.activePointsInterval)
         }
     }
-    
+
+    // Adds a set of reference lines (for example the y-axis height delimiters)
     public func addReferenceLines(referenceLines: ReferenceLines) {
         
         // If we aren't setup yet, just save the reference lines and the setup will take care of it.
@@ -800,7 +802,8 @@ import UIKit
             }
         }
     }
-    
+
+    // Called when the Y-Axis range is changed, typically as a result of the active points changing and having values outside the current range.
     private func rangeDidChange() {
         
         // If shouldAnimateOnAdapt is enabled it will kickoff any animations that need to occur.
@@ -817,7 +820,8 @@ import UIKit
         
         referenceLineView?.set(range: range)
     }
-    
+
+    // The viewport changes size only when an orientation change or similar phenomenon occurs.
     private func viewportDidChange() {
         
         // We need to make sure all the drawing views are the same size as the viewport.
@@ -862,7 +866,6 @@ import UIKit
     }
     
     // Animations
-    
     private func startAnimations(withStaggerValue stagger: Double = 0) {
         var pointsToAnimate = 0 ..< 0
         
@@ -987,6 +990,9 @@ import UIKit
     
     // MARK: - Drawing Delegate
     // ########################
+    /* Drawing Delegate functions are called by the children ScrollableGraphViewDrawingLayers to recieve updated info about how to draw
+
+     */
     
     internal func calculatePosition(atIndex index: Int, value: Double) -> CGPoint {
         
@@ -1054,13 +1060,17 @@ import UIKit
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////
+    //MARK: -
+    //MARK: - Screenshot Functions
     public func captureGraphScreenshot() -> UIImage? {
         // Reduce the datapoint spacing to achieve unit width: meaning the entire graph fits exactly in the viewport window with all points rendered.
         let previousDatapointSpacing: CGFloat = self.dataPointSpacing
         let previousDelegate: ScrollableGraphViewDelegate? = self.graphViewDelegate
         let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
-//        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
-//        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+        //        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
+        //        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
 
         // Determines the datapoint spacing required to exactly fill the width of the viewport
         let newRequiredDatapointSpacing: CGFloat = self.getDatapointSpacing(forDesiredGraphWidth: self.viewportWidth, forNumberOfDataPoints: numberOfDataPoints)
@@ -1073,7 +1083,7 @@ import UIKit
         self.reload()
 
         //Screenshot here
-//        self.drawingView.snapshotView(afterScreenUpdates: true)
+        //        self.drawingView.snapshotView(afterScreenUpdates: true)
         let validScreenshot: UIImage? = self.screenshot()
 
         //Revert the graph to the user's settings
@@ -1084,125 +1094,11 @@ import UIKit
 
         return validScreenshot
     }
-}
-
-// MARK: - ScrollableGraphView Settings Enums
-// ##########################################
-
-@objc public enum ScrollableGraphViewDirection : Int {
-    case leftToRight
-    case rightToLeft
-}
-
-// Simple queue data structure for keeping track of which
-// plots have been added.
-fileprivate class SGVQueue<T> {
-    
-    var storage: [T]
-    
-    public var count: Int {
-        get {
-            return storage.count
-        }
-    }
-    
-    init() {
-        storage = [T]()
-    }
-    
-    public func enqueue(element: T) {
-        storage.insert(element, at: 0)
-    }
-    
-    public func dequeue() -> T? {
-        return storage.popLast()
-    }
-}
-
-// We have to be our own data source for interface builder.
-#if TARGET_INTERFACE_BUILDER
-extension ScrollableGraphView : ScrollableGraphViewDataSource {
-    
-    var numberOfDisplayItems: Int {
-        get {
-            return 30
-        }
-    }
-    
-    var linePlotData: [Double] {
-        get {
-            return self.generateRandomData(numberOfDisplayItems, max: 100, shouldIncludeOutliers: false)
-        }
-    }
-    
-    public func value(forPlot plot: Plot, atIndex pointIndex: Int) -> Double? {
-        return linePlotData[pointIndex]
-    }
-    
-    public func label(atIndex pointIndex: Int) -> String {
-        return "\(pointIndex)"
-    }
-    
-    public func numberOfPoints() -> Int {
-        return numberOfDisplayItems
-    }
-    
-    private func generateRandomData(_ numberOfItems: Int, max: Double, shouldIncludeOutliers: Bool = true) -> [Double] {
-        var data = [Double]()
-        for _ in 0 ..< numberOfItems {
-            var randomNumber = Double(arc4random()).truncatingRemainder(dividingBy: max)
-            
-            if(shouldIncludeOutliers) {
-                if(arc4random() % 100 < 10) {
-                    randomNumber *= 3
-                }
-            }
-            
-            data.append(randomNumber)
-        }
-        return data
-    }
-
-    public func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool {
-        return true
-    }
-
-    public func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor? {
-        return nil
-    }
-
-
-    public func labelColor(atIndex pointIndex: Int) -> UIColor? {
-        return nil
-    }
-}
-#endif
-
-
-public extension UIScrollView {
-
-    // Screenshots
-    func screenshot() -> UIImage? {
-        let savedContentOffset = self.contentOffset
-        let savedFrame = self.frame
-
-        UIGraphicsBeginImageContext(self.contentSize)
-        self.contentOffset = .zero
-        self.frame = CGRect(x: 0, y: 0, width: self.contentSize.width, height: self.contentSize.height)
-
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
-
-        self.layer.render(in: context)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext();
-
-        self.contentOffset = savedContentOffset
-        self.frame = savedFrame
-
-        return image
-    }
-}
-
-public extension ScrollableGraphView {
 
 }
+
+
+
+
+
+

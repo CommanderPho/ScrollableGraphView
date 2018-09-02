@@ -67,9 +67,7 @@ internal class AnnotationDrawingLayer: ScrollableGraphViewDrawingLayer {
         annotationPath.removeAllPoints()
 
         // We can only move forward if we can get the data we need from the delegate.
-        guard let
-            activePointsInterval = self.owner?.graphViewDrawingDelegate?.intervalForActivePoints()
-            else {
+        guard let activePointsInterval = self.owner?.graphViewDrawingDelegate?.intervalForActivePoints() else {
                 return annotationPath
         }
 
