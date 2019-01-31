@@ -17,7 +17,7 @@ import Foundation
 public extension UIScrollView {
 
     // Screenshots
-    func screenshot() -> UIImage? {
+    func screenshot() -> ScrollableGraphViewNSUI.NSUIImage? {
         let savedContentOffset = self.contentOffset
         let savedFrame = self.frame
 

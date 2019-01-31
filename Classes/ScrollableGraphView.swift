@@ -1119,7 +1119,7 @@
     ////////////////////////////////////////////////////////////////////
     //MARK: -
     //MARK: - Screenshot Functions
-    public func captureGraphScreenshot() -> UIImage? {
+    public func captureGraphScreenshot() -> ScrollableGraphViewNSUI.NSUIImage? {
         // Reduce the datapoint spacing to achieve unit width: meaning the entire graph fits exactly in the viewport window with all points rendered.
         let previousDatapointSpacing: CGFloat = self.dataPointSpacing
         let previousDelegate: ScrollableGraphViewDelegate? = self.graphViewDelegate
@@ -1139,7 +1139,7 @@
 
         //Screenshot here
         //        self.drawingView.snapshotView(afterScreenUpdates: true)
-        let validScreenshot: UIImage? = self.screenshot()
+        let validScreenshot: ScrollableGraphViewNSUI.NSUIImage? = self.screenshot()
 
         //Revert the graph to the user's settings
         self.dataPointSpacing = previousDatapointSpacing

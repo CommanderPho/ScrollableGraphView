@@ -43,7 +43,7 @@ open class ReferenceLines {
     // #####################
     
     /// The font to be used for the reference line labels.
-    open var referenceLineLabelFont = UIFont.systemFont(ofSize: 8)
+    open var referenceLineLabelFont = ScrollableGraphViewNSUI.NSUIFont.systemFont(ofSize: 8)
     /// The colour of the reference line labels.
     @IBInspectable open var referenceLineLabelColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.black
     
@@ -68,7 +68,7 @@ open class ReferenceLines {
     /// The font for the data point labels.
     @IBInspectable open var dataPointLabelColor: ScrollableGraphViewNSUI.NSUIColor = ScrollableGraphViewNSUI.NSUIColor.black
     /// The colour for the data point labels.
-    open var dataPointLabelFont: UIFont? = UIFont.systemFont(ofSize: 10)
+    open var dataPointLabelFont: ScrollableGraphViewNSUI.NSUIFont? = ScrollableGraphViewNSUI.NSUIFont.systemFont(ofSize: 10)
     /// Used to force the graph to show every n-th dataPoint label
     @IBInspectable open var dataPointLabelsSparsity: Int = 1
     
