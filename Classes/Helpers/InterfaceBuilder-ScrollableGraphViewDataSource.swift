@@ -11,7 +11,7 @@ import Foundation
 
 // We have to be our own data source for interface builder.
 #if TARGET_INTERFACE_BUILDER
-public extension ScrollableGraphView : ScrollableGraphViewDataSource {
+extension ScrollableGraphView : ScrollableGraphViewDataSource {
 
     var numberOfDisplayItems: Int {
         get {
