@@ -71,18 +71,18 @@ import UIKit
     private var isInitialSetup = true
     private var isCurrentlySettingUp = false
     
-    private var viewportWidth: CGFloat = 0 {
+    internal var viewportWidth: CGFloat = 0 {
         didSet { if(oldValue != viewportWidth) { viewportDidChange() }}
     }
-    private var viewportHeight: CGFloat = 0 {
+    internal var viewportHeight: CGFloat = 0 {
         didSet { if(oldValue != viewportHeight) { viewportDidChange() }}
     }
     
-    private var totalGraphWidth: CGFloat = 0
-    private var offsetWidth: CGFloat = 0
+    internal var totalGraphWidth: CGFloat = 0
+    internal var offsetWidth: CGFloat = 0
     
     // Graph Line
-    private var zeroYPosition: CGFloat = 0
+    internal var zeroYPosition: CGFloat = 0
     
     // Graph Drawing
     private var drawingView = UIView()
@@ -103,10 +103,29 @@ import UIKit
             }
         }
     }
+
+
+    // Returns the current size and offset of the viewport
+    open var viewportInfo: ViewportInfo {
+        return ViewportInfo(width: self.viewportWidth, height: self.viewportHeight, offset: (self.offsetWidth, 0.0), totalGraphWidth: self.totalGraphWidth)
+    }
+
+    public func getDrawingView() -> UIView {
+        return self.drawingView
+    }
+    public func getReferenceLinesView() -> UIView? {
+        return self.referenceLineView
+    }
+    public func getLabelsView() -> UIView {
+        return self.labelsView
+    }
+
+    // Delegate
+    open var graphViewDelegate: ScrollableGraphViewDelegate? = nil
     
     // Active Points & Range Calculation
-    private var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
-    private var activePointsInterval: CountableRange<Int> = -1 ..< -1 {
+    internal var previousActivePointsInterval: CountableRange<Int> = -1 ..< -1
+    internal var activePointsInterval: CountableRange<Int> = -1 ..< -1 {
         didSet {
             if(oldValue.lowerBound != activePointsInterval.lowerBound || oldValue.upperBound != activePointsInterval.upperBound) {
                 if !isCurrentlySettingUp { activePointsDidChange() }
@@ -114,7 +133,7 @@ import UIKit
         }
     }
     
-    private var range: (min: Double, max: Double) = (0, 100) {
+    internal var range: (min: Double, max: Double) = (0, 100) {
         didSet {
             if(oldValue.min != range.min || oldValue.max != range.max) {
                 if !isCurrentlySettingUp { rangeDidChange() }
@@ -158,9 +177,47 @@ import UIKit
         let referenceLines = ReferenceLines()
         self.addReferenceLines(referenceLines: referenceLines)
     }
-    
+
+
+    public func reset() {
+        self.stopAnimations()
+        self.graphViewDelegate = nil
+        self.plots.removeAll()
+        self.referenceLineView?.removeFromSuperview()
+        self.labelsView.removeFromSuperview()
+        self.drawingView.removeFromSuperview()
+
+        self.referenceLines = nil
+
+        self.isInitialSetup = true
+        self.isCurrentlySettingUp = false
+
+        self.viewportWidth = 0
+        self.viewportHeight = 0
+        self.totalGraphWidth = 0
+        self.offsetWidth = 0
+        // Graph Line
+        self.zeroYPosition = 0
+        // Graph Drawing
+        self.drawingView = UIView()
+        self.plots = [Plot]()
+
+        // Reference Lines
+        self.referenceLineView = nil
+
+        // Labels
+        self.labelsView = UIView()
+        self.labelPool = LabelPool()
+
+        // Data Source
+        self.dataSource = nil
+        // Active Points & Range Calculation
+        self.previousActivePointsInterval = -1 ..< -1
+        self.activePointsInterval = -1 ..< -1
+        self.range = (0, 100)
+    }
+
     private func setup() {
-        
         clipsToBounds = true
         isCurrentlySettingUp = true
         
@@ -176,11 +233,14 @@ import UIKit
         // Add the subviews we will use to draw everything.
         
         // Add the drawing view in which we draw all the plots.
-        drawingView = UIView(frame: viewport)
-        drawingView.backgroundColor = backgroundFillColor
+        self.drawingView = UIView(frame: viewport)
+        self.drawingView.backgroundColor = backgroundFillColor
+        self.drawingView.accessibilityIdentifier = "drawingView"
         self.addSubview(drawingView)
         
         // Add the x-axis labels view.
+        self.labelsView.accessibilityIdentifier = "labelsView"
+        self.drawingView.accessibilityIdentifier = "drawingView"
         self.insertSubview(labelsView, aboveSubview: drawingView)
         
         // 2.
@@ -188,8 +248,8 @@ import UIKit
         
         // Calculate the drawing frames
         let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
-        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
-        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+        self.totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
+        self.contentSize = CGSize(width: self.totalGraphWidth, height: self.viewportHeight)
         
         // Scrolling direction.
         
@@ -212,13 +272,14 @@ import UIKit
         // Calculate the points that we will be able to see when the view loads.
         
         let initialActivePointsInterval = calculateActivePointsInterval()
-        
+        self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: initialActivePointsInterval.map{$0})
+
         // 4.
         // Add the plots to the graph, we need these to calculate the range.
         
-        while(queuedPlots.count > 0) {
-            if let plot = queuedPlots.dequeue() {
-                addPlotToGraph(plot: plot, activePointsInterval: initialActivePointsInterval)
+        while(self.queuedPlots.count > 0) {
+            if let plot = self.queuedPlots.dequeue() {
+                self.addPlotToGraph(plot: plot, activePointsInterval: initialActivePointsInterval)
             }
         }
         
@@ -300,9 +361,10 @@ import UIKit
                 referenceLineColor: referenceLines.referenceLineColor,
                 referenceLineThickness: referenceLines.referenceLineThickness,
                 referenceLineSettings: referenceLines)
-            
+
+            self.referenceLineView?.accessibilityIdentifier = "referenceLineView"
             referenceLineView?.set(range: self.range)
-            
+
             self.addSubview(referenceLineView!)
         }
     }
@@ -358,7 +420,7 @@ import UIKit
             
             // If the scrollview has scrolled anywhere, we need to update the offset
             // and move around our drawing views.
-            offsetWidth = self.contentOffset.x
+            self.offsetWidth = self.contentOffset.x
             updateOffsetWidths()
             
             // Recalculate active points for this size.
@@ -366,7 +428,8 @@ import UIKit
             let newActivePointsInterval = calculateActivePointsInterval()
             self.previousActivePointsInterval = self.activePointsInterval
             self.activePointsInterval = newActivePointsInterval
-            
+            self.graphViewDelegate?.scrollableGraphView(self, batchUpdateActivePoints: newActivePointsInterval.map{$0})
+
             // If adaption is enabled we want to
             if(shouldAdaptRange) {
                 // TODO: This is currently called every single frame...
@@ -382,7 +445,9 @@ import UIKit
     private func updateOffsetWidths() {
         drawingView.frame.origin.x = offsetWidth
         drawingView.bounds.origin.x = offsetWidth
-        
+
+        self.graphViewDelegate?.scrollableGraphView(self, didUpdateViewportOffset: (self.offsetWidth/self.totalGraphWidth))
+
         updateOffsetsForGradients(offsetWidth: offsetWidth)
         
         referenceLineView?.frame.origin.x = offsetWidth
@@ -437,12 +502,12 @@ import UIKit
     
     public func addPlot(plot: Plot) {
         // If we aren't setup yet, save the plot to be added during setup.
-        if(isInitialSetup) {
+        if(self.isInitialSetup) {
             enqueuePlot(plot)
         }
         // Otherwise, just add the plot directly.
         else {
-            addPlotToGraph(plot: plot, activePointsInterval: self.activePointsInterval)
+            self.addPlotToGraph(plot: plot, activePointsInterval: self.activePointsInterval)
         }
     }
     
@@ -457,7 +522,8 @@ import UIKit
             addReferenceLinesToGraph(referenceLines: referenceLines)
         }
     }
-    
+
+
     // Limitation: Can only be used when reloading the same number of data points!
     public func reload() {
         stopAnimations()
@@ -481,7 +547,17 @@ import UIKit
         initPlot(plot: plot, activePointsInterval: activePointsInterval)
         startAnimations(withStaggerValue: 0.15)
     }
-    
+
+
+//    private func removePlotFromGraph(plot: Plot, activePointsInterval: CountableRange<Int>) {
+//        plot.graphViewDrawingDelegate = nil
+//        if let validIndex = self.plots.index(where: {return ($0.identifier == plot.identifier)}) {
+//            self.plots.remove(at: validIndex)
+//        }
+//        initPlot(plot: plot, activePointsInterval: activePointsInterval)
+////        startAnimations(withStaggerValue: 0.15)
+//    }
+
     private func addReferenceLinesToGraph(referenceLines: ReferenceLines) {
         self.referenceLines = referenceLines
         addReferenceViewDrawingView()
@@ -500,7 +576,7 @@ import UIKit
         // If we are not animating on startup then just set all the plot positions to their respective values
         if(!shouldAnimateOnStartup) {
             let dataForInitialPoints = getData(forPlot: plot, andActiveInterval: activePointsInterval)
-            plot.setPlotPointPositions(forNewlyActivatedPoints: activePointsInterval, withData: dataForInitialPoints)
+            plot.setPlotPointDataValues(forNewlyActivatedPoints: activePointsInterval, withData: dataForInitialPoints)
         }
         
         addSubLayers(layers: plot.layers(forViewport: currentViewport()))
@@ -595,23 +671,25 @@ import UIKit
         }
         else {
             
-            let range = calculateRange(for: dataForActivePoints)
+            let range = calculateRange(for: dataForActivePoints.map({$0.value}))
+            //TODO: perhaps use isVisible to modify the range (like cutting out invisible values)
             return clean(range: range)
         }
     }
     
-    private func calculateRange<T: Collection>(for data: T) -> (min: Double, max: Double) where T.Iterator.Element == Double {
+    private func calculateRange<T: Collection>(for data: T) -> (min: Double, max: Double) where T.Iterator.Element == Double? {
         
         var rangeMin: Double = Double(Int.max)
         var rangeMax: Double = Double(Int.min)
         
         for dataPoint in data {
-            if (dataPoint > rangeMax) {
-                rangeMax = dataPoint
-            }
-            
-            if (dataPoint < rangeMin) {
-                rangeMin = dataPoint
+            if let validDataPoint = dataPoint {
+                if (validDataPoint > rangeMax) {
+                    rangeMax = validDataPoint
+                }
+                if (validDataPoint < rangeMin) {
+                    rangeMin = validDataPoint
+                }
             }
         }
         return (min: rangeMin, max: rangeMax)
@@ -643,10 +721,18 @@ import UIKit
     }
     
     private func graphWidth(forNumberOfDataPoints numberOfPoints: Int) -> CGFloat {
-        let width: CGFloat = (CGFloat(numberOfPoints - 1) * dataPointSpacing) + (leftmostPointPadding + rightmostPointPadding)
+        let width: CGFloat = (CGFloat(numberOfPoints - 1) * self.dataPointSpacing) + (leftmostPointPadding + rightmostPointPadding)
         return width
     }
-    
+
+    // Basically does the inverse of private func graphWidth(forNumberOfDataPoints numberOfPoints: Int) -> CGFloat
+    // For a given GRAPH width, and a fixed number of datapoints, it determines that datapoint spacing required to satisfy these conditions.
+    private func getDatapointSpacing(forDesiredGraphWidth desiredGraphWidth: CGFloat, forNumberOfDataPoints numberOfPoints: Int) -> CGFloat {
+        let desiredDatapointSpacing: CGFloat = ((desiredGraphWidth - (self.leftmostPointPadding + self.rightmostPointPadding)) / CGFloat(numberOfPoints - 1))
+        return desiredDatapointSpacing
+    }
+
+
     private func clamp<T: Comparable>(value:T, min:T, max:T) -> T {
         if (value < min) {
             return min
@@ -658,31 +744,32 @@ import UIKit
             return value
         }
     }
-    
-    private func getData(forPlot plot: Plot, andActiveInterval activeInterval: CountableRange<Int>) -> [Double] {
-        
-        var dataForInterval = [Double]()
-        
+
+
+    private func getData(forPlot plot: Plot, andActiveInterval activeInterval: CountableRange<Int>) -> [PlotPointData] {
+        var dataForInterval = [PlotPointData]()
         for i in activeInterval.startIndex ..< activeInterval.endIndex {
-            let dataForIndexI = dataSource?.value(forPlot: plot, atIndex: i) ?? 0
+            var dataForIndexI = PlotPointData()
+            dataForIndexI.value = dataSource?.value(forPlot: plot, atIndex: i)
+            dataForIndexI.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: i) ?? false
+            dataForIndexI.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: i)
             dataForInterval.append(dataForIndexI)
         }
-        
         return dataForInterval
     }
     
-    private func getData(forPlot plot: Plot, andNewlyActivatedPoints activatedPoints: [Int]) -> [Double] {
-        
-        var dataForActivatedPoints = [Double]()
-        
+    private func getData(forPlot plot: Plot, andNewlyActivatedPoints activatedPoints: [Int]) -> [PlotPointData] {
+        var dataForActivatedPoints = [PlotPointData]()
         for activatedPoint in activatedPoints {
-            let dataForActivatedPoint = dataSource?.value(forPlot: plot, atIndex: activatedPoint) ?? 0
+            var dataForActivatedPoint = PlotPointData()
+            dataForActivatedPoint.value = dataSource?.value(forPlot: plot, atIndex: activatedPoint)
+            dataForActivatedPoint.isVisible = dataSource?.isVisible(forPlot: plot, atIndex: activatedPoint) ?? false
+            dataForActivatedPoint.colorOverride = dataSource?.valueColor(forPlot: plot, atIndex: activatedPoint)
             dataForActivatedPoints.append(dataForActivatedPoint)
         }
-        
         return dataForActivatedPoints
     }
-    
+
     // MARK: Events
     // ############
     
@@ -697,7 +784,15 @@ import UIKit
         if(!isInitialSetup) {
             for plot in plots {
                 let newData = getData(forPlot: plot, andNewlyActivatedPoints: activatedPoints)
-                plot.setPlotPointPositions(forNewlyActivatedPoints: activatedPoints, withData: newData)
+                plot.setPlotPointDataValues(forNewlyActivatedPoints: activatedPoints, withData: newData)
+                if let validGraphDelegate = self.graphViewDelegate {
+                    for aDeactivatedPoint in deactivatedPoints {
+                        validGraphDelegate.scrollableGraphView(self, didEndDisplaying: aDeactivatedPoint, forPlot: plot)
+                    }
+                    for anActivatedPoint in activatedPoints {
+                        validGraphDelegate.scrollableGraphView(self, didEndDisplaying: anActivatedPoint, forPlot: plot)
+                    }
+                }
             }
         }
         
@@ -722,7 +817,7 @@ import UIKit
             // Otherwise we should simple just move the data to their positions.
             for plot in plots {
                 let newData = getData(forPlot: plot, andActiveInterval: activePointsInterval)
-                plot.setPlotPointPositions(forNewlyActivatedPoints: intervalForActivePoints(), withData: newData)
+                plot.setPlotPointDataValues(forNewlyActivatedPoints: intervalForActivePoints(), withData: newData)
             }
         }
         
@@ -786,6 +881,8 @@ import UIKit
         for plot in plots {
             let dataForPointsToAnimate = getData(forPlot: plot, andActiveInterval: pointsToAnimate)
             plot.startAnimations(forPoints: pointsToAnimate, withData: dataForPointsToAnimate, withStaggerValue: stagger)
+
+            //TODO: Visibility
         }
     }
     
@@ -814,8 +911,26 @@ import UIKit
         for point in activatedPoints {
             let label = labelPool.activateLabel(forPointIndex: point)
             
-            label.text = (dataSource?.label(atIndex: point) ?? "")
-            label.textColor = ref.dataPointLabelColor
+//            label.text = (dataSource?.label(atIndex: point) ?? "")
+
+            if let validDataSource  = self.dataSource {
+                // Required Datasource Methods
+                label.text = validDataSource.label(atIndex: point)
+
+                // Optional Datasource Methods
+                if let specifiedLabelColor = validDataSource.labelColor(atIndex: point) {
+                    label.textColor = specifiedLabelColor
+                }
+                else {
+                    label.textColor = ref.dataPointLabelColor
+                }
+            }
+            else {
+                // No datasource
+                label.text = ""
+                label.textColor = ref.dataPointLabelColor
+            }
+
             label.font = ref.dataPointLabelFont
             
             label.sizeToFit()
@@ -944,6 +1059,37 @@ import UIKit
             }
         }
     }
+
+    public func captureGraphScreenshot() -> UIImage? {
+        // Reduce the datapoint spacing to achieve unit width: meaning the entire graph fits exactly in the viewport window with all points rendered.
+        let previousDatapointSpacing: CGFloat = self.dataPointSpacing
+        let previousDelegate: ScrollableGraphViewDelegate? = self.graphViewDelegate
+        let numberOfDataPoints = dataSource?.numberOfPoints() ?? 0
+//        totalGraphWidth = graphWidth(forNumberOfDataPoints: numberOfDataPoints)
+//        self.contentSize = CGSize(width: totalGraphWidth, height: viewportHeight)
+
+        // Determines the datapoint spacing required to exactly fill the width of the viewport
+        let newRequiredDatapointSpacing: CGFloat = self.getDatapointSpacing(forDesiredGraphWidth: self.viewportWidth, forNumberOfDataPoints: numberOfDataPoints)
+
+        // Remove the delegate so we don't get callbacks during the screenshot
+        self.graphViewDelegate = nil
+        // Reload with the new dataPoint spacing
+        self.dataPointSpacing = newRequiredDatapointSpacing
+        // Reload the graph with new datapoint spacing
+        self.reload()
+
+        //Screenshot here
+//        self.drawingView.snapshotView(afterScreenUpdates: true)
+        let validScreenshot: UIImage? = self.screenshot()
+
+        //Revert the graph to the user's settings
+        self.dataPointSpacing = previousDatapointSpacing
+        self.reload()
+        // Restore the delegate once the screenshot is done
+        self.graphViewDelegate = previousDelegate
+
+        return validScreenshot
+    }
 }
 
 // MARK: - ScrollableGraphView Settings Enums
@@ -981,7 +1127,7 @@ fileprivate class SGVQueue<T> {
 
 // We have to be our own data source for interface builder.
 #if TARGET_INTERFACE_BUILDER
-public extension ScrollableGraphView : ScrollableGraphViewDataSource {
+extension ScrollableGraphView : ScrollableGraphViewDataSource {
     
     var numberOfDisplayItems: Int {
         get {
@@ -995,7 +1141,7 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
         }
     }
     
-    public func value(forPlot plot: Plot, atIndex pointIndex: Int) -> Double {
+    public func value(forPlot plot: Plot, atIndex pointIndex: Int) -> Double? {
         return linePlotData[pointIndex]
     }
     
@@ -1022,6 +1168,47 @@ public extension ScrollableGraphView : ScrollableGraphViewDataSource {
         }
         return data
     }
+
+    public func isVisible(forPlot plot: Plot, atIndex pointIndex: Int) -> Bool {
+        return true
+    }
+
+    public func valueColor(forPlot plot: Plot, atIndex pointIndex: Int) -> UIColor? {
+        return nil
+    }
+
+
+    public func labelColor(atIndex pointIndex: Int) -> UIColor? {
+        return nil
+    }
 }
 #endif
 
+
+public extension UIScrollView {
+
+    // Screenshots
+    func screenshot() -> UIImage? {
+        let savedContentOffset = self.contentOffset
+        let savedFrame = self.frame
+
+        UIGraphicsBeginImageContext(self.contentSize)
+        self.contentOffset = .zero
+        self.frame = CGRect(x: 0, y: 0, width: self.contentSize.width, height: self.contentSize.height)
+
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+
+        self.layer.render(in: context)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+
+        self.contentOffset = savedContentOffset
+        self.frame = savedFrame
+
+        return image
+    }
+}
+
+public extension ScrollableGraphView {
+
+}

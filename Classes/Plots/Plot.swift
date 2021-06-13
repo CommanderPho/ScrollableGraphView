@@ -141,9 +141,8 @@ open class Plot {
         return dt
     }
     
-    internal func startAnimations(forPoints pointsToAnimate: CountableRange<Int>, withData data: [Double], withStaggerValue stagger: Double) {
-        
-        animatePlotPointPositions(forPoints: pointsToAnimate, withData: data, withDelay: stagger)
+    internal func startAnimations(forPoints pointsToAnimate: CountableRange<Int>, withData data: [PlotPointData], withStaggerValue stagger: Double) {
+        animatePlotPointData(forPoints: pointsToAnimate, withData: data, withDelay: stagger)
     }
     
     internal func createPlotPoints(numberOfPoints: Int, range: (min: Double, max: Double)) {
@@ -160,49 +159,69 @@ open class Plot {
     // When active interval changes, need to set the position for any NEWLY ACTIVATED points, otherwise
     // they will come on screen at the incorrect position.
     // Needs to be called when the active interval has changed and during initial setup.
-    internal func setPlotPointPositions(forNewlyActivatedPoints newPoints: CountableRange<Int>, withData data: [Double]) {
+    internal func setPlotPointDataValues(forNewlyActivatedPoints newPoints: CountableRange<Int>, withData data: [PlotPointData]) {
         
         for i in newPoints.startIndex ..< newPoints.endIndex {
             // e.g.
             // indices: 10...20
             // data positions: 0...10 = // 0 to (end - start)
             let dataPosition = i - newPoints.startIndex
+            let currData = data[dataPosition]
+            let currValue: Double
+            if let validValue = currData.value { currValue = validValue }
+            else { currValue = 0.0 }
+            let isVisible = currData.isVisible
+            let color = currData.colorOverride
             
-            let value = data[dataPosition]
-            
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: value)
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: i, value: currValue)
             graphPoints[i].x = newPosition.x
             graphPoints[i].y = newPosition.y
+            graphPoints[i].isVisible = isVisible
+            graphPoints[i].colorOverride = color
         }
     }
     
     // Same as a above, but can take an array with the indicies of the activated points rather than a range.
-    internal func setPlotPointPositions(forNewlyActivatedPoints activatedPoints: [Int], withData data: [Double]) {
+    internal func setPlotPointDataValues(forNewlyActivatedPoints activatedPoints: [Int], withData data: [PlotPointData]) {
         
         var index = 0
         for activatedPointIndex in activatedPoints {
-            
+        
             let dataPosition = index
-            let value = data[dataPosition]
-            
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: activatedPointIndex, value: value)
+            let currData = data[dataPosition]
+            let currValue: Double
+            if let validValue = currData.value { currValue = validValue }
+            else { currValue = 0.0 }
+
+            let isVisible = currData.isVisible
+            let color = currData.colorOverride
+
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: activatedPointIndex, value: currValue)
             graphPoints[activatedPointIndex].x = newPosition.x
             graphPoints[activatedPointIndex].y = newPosition.y
-            
+            graphPoints[activatedPointIndex].isVisible = isVisible
+            graphPoints[activatedPointIndex].colorOverride = color
             index += 1
         }
     }
-    
+
+
+    //TODO: Could animate other non-position data values (like color)
     // When the range changes, we need to set the position for any VISIBLE points, either animating or setting directly
     // depending on the settings.
     // Needs to be called when the range has changed.
-    internal func animatePlotPointPositions(forPoints pointsToAnimate: CountableRange<Int>, withData data: [Double], withDelay delay: Double) {
+    internal func animatePlotPointData(forPoints pointsToAnimate: CountableRange<Int>, withData data: [PlotPointData], withDelay delay: Double) {
         // For any visible points, kickoff the animation to their new position after the axis' min/max has changed.
         var dataIndex = 0
         for pointIndex in pointsToAnimate {
-            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: data[dataIndex])
-            let point = graphPoints[pointIndex]
-            animate(point: point, to: newPosition, withDelay: Double(dataIndex) * delay)
+            let currValue: Double
+            if let validValue = data[dataIndex].value { currValue = validValue }
+            else { currValue = 0.0 }
+            let newPosition = graphViewDrawingDelegate.calculatePosition(atIndex: pointIndex, value: currValue) //TODO: why is this not data[pointIndex]??? I think it's because the only data passed in is the data corresponding to each of the pointsToAnimate
+            animate(point: graphPoints[pointIndex], to: newPosition, withDelay: Double(dataIndex) * delay)
+            // Update the other parameters instantly (no animation)
+            graphPoints[pointIndex].colorOverride = data[dataIndex].colorOverride
+            graphPoints[pointIndex].isVisible = data[dataIndex].isVisible
             dataIndex += 1
         }
     }
@@ -229,6 +248,12 @@ open class Plot {
     
     internal func graphPoint(forIndex index: Int) -> GraphPoint {
         return graphPoints[index]
+    }
+}
+
+extension Plot: Equatable {
+    public static func ==(lhs: Plot, rhs: Plot) -> Bool {
+        return (lhs.identifier == rhs.identifier)
     }
 }
 
